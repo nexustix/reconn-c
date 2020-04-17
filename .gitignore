@@ -1,0 +1,10 @@
+_discard/
+_legacy/
+bin/
+obj/
+build/
+
+*.make
+Makefile
+
+.vscode/

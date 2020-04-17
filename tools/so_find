@@ -1,0 +1,55 @@
+#! /bin/sh
+bin_path=$1
+architecture_filter=${2:-"amd64"}
+
+# 32 bit => i386
+# 64 bit => i386:x86-64
+
+case $architecture_filter in
+  "amd64"|"i386:x86-64")
+    architecture_filter="i386:x86-64"
+  ;;
+  "amd32"|"i386")
+    architecture_filter="i386"
+  ;;
+  *)
+  >&2 echo "<!> Unknown architecture: ${architecture_filter}"
+  exit
+esac
+
+result=""
+
+# get needed library names
+for dep in $(objdump -p $bin_path | grep NEEDED | sed -n 's/^.*lib/lib/p')
+do
+  result=""
+
+  # get paths library can be found at
+  libpaths=$(ldconfig -p | grep $dep | sed -n 's/^.*=> //p')
+
+  # (return value can contain multiple results)
+  for libpath in $libpaths
+  do
+    # get architecture of library
+    architecture=$(objdump -f $libpath | grep architecture)
+    architecture=$(echo "$architecture" | sed -e "s/^architecture: //" -e "s/, flags.*//")
+
+    # only get the results witch correct architecture
+    if [[ $architecture == $architecture_filter ]]
+    then
+      result=$libpath
+      break
+    else
+      # >&2 echo "<-> ${libpath} wrong architecture"
+      :
+    fi
+  done
+
+  if [ -z "$result" ]
+  then
+    # write errors to STDERR
+    >&2 echo "<!> ${dep} missing"
+  else
+    echo $result
+  fi
+done

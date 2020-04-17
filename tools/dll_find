@@ -1,0 +1,84 @@
+#! /bin/zsh
+bin_path=$1
+architecture_filter=${2:-"amd64"}
+
+dll_root=""
+case $architecture_filter in
+  "amd64"|"i386:x86-64")
+    dll_root="/usr/x86_64-w64-mingw32/bin/"
+  ;;
+  "amd32"|"i386")
+    dll_root="/usr/i686-w64-mingw32/bin/"
+  ;;
+  *)
+  >&2 echo "<!> Unknown architecture: ${architecture_filter}"
+  exit
+esac
+
+found_dlls=()
+dlls_for_file() {
+  local dirty_dlls=$(x86_64-w64-mingw32-objdump -p $1 | grep "DLL Name" )
+  local dirty_dlls=($(echo $dirty_dlls | sed -n 's/^.*Name: //p'))
+  found_dlls=()
+  for dep in $dirty_dlls
+  do
+    case $dep in
+      "KERNEL32.dll")
+      ;;
+      "USER32.dll")
+      ;;
+      "msvcrt.dll")
+      ;;
+      "GDI32.dll")
+      ;;
+      "ole32.dll")
+      ;;
+      "OPENGL32.dll")
+      ;;
+      "PSAPI.DLL")
+      ;;
+      "SHELL32.dll")
+      ;;
+      "SHLWAPI.dll")
+      ;;
+      "WINMM.dll")
+      ;;
+      "")
+      ;;
+      *)
+      found_dlls+=${dll_root}${dep}
+    esac
+  done
+}
+
+all_found=()
+dlls_for_file $bin_path
+last_found=(${found_dlls})
+all_found+=(${last_found})
+
+recurse_dlls(){
+  tmp_last_found=(${last_found})
+  last_found=()
+
+  for dep in $tmp_last_found
+  do
+    dlls_for_file $dep
+    last_found+=(${found_dlls})
+  done
+
+  all_found+=(${last_found})
+  all_found=($(echo "${all_found[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+}
+
+max_recursions=4
+cur_recursions=0
+while [ $cur_recursions -lt $max_recursions ]
+do
+  recurse_dlls
+  cur_recursions=$(( $cur_recursions + 1 ))
+done
+
+for dep in $all_found
+do
+  echo $dep
+done
