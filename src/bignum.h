@@ -34,7 +34,10 @@ void recycleBignum(Bignum* self){
   if (self->reserve > 16){
     free(self->digits);
     self->digits = (unsigned char *)malloc(16);
-  }
+  }//else if(!self->reserve){
+  //  self->digits = (unsigned char *)malloc(0);
+  //  self->reserve = 0;
+  //}
 }
 
 void copyBignum(Bignum* destination, Bignum* source){

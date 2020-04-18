@@ -11,7 +11,7 @@ typedef struct{
     unsigned long bucket_count;
 }Dictionary;
 
-
+/*
 Dictionary *newDictionary(unsigned long bucket_count){
     Dictionary *self = (Dictionary *)calloc(1, sizeof(*self));
     self->bucket_count = bucket_count;
@@ -27,5 +27,5 @@ void dictionary_add(Dictionary *self, char *key, void *value){
 }
 void dictionary_forget(Dictionary *self, char *key){}
 void dictionary_forget_all(Dictionary *self, char *key){}
-
+*/
 #endif
