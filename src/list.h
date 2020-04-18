@@ -19,7 +19,8 @@ List *newList(unsigned long initial_size){
     self->top = 0;
     //self->elements = (Element*)calloc(self->reserve, self->size*sizeof(Element));
     self->elements = (Element*)calloc(self->reserve, sizeof(Element));
-    self->elements[0].kind = KIND_NOTHING;
+    //self->elements[0].kind = KIND_NOTHING;
+    self->elements[0].kind = KIND_VOID;
     return self;
 }
 

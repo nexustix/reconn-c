@@ -24,28 +24,26 @@ Dictionary *newDictionary(unsigned long bucket_count){
 unsigned long dictionary_has_key(Dictionary *self, char *key){
     unsigned long hash = hash_cstring(key, self->bucket_count);
     if (self->buckets[hash].top){
-        //printf("}%lu{\n", );
-        //printf("CAKE\n" );
         for (unsigned long i=0; i < self->buckets[hash].top; i++){
             unsigned long index = self->buckets[hash].top - i;
-            //printf("}%lu{}%lu{\n", i, index);
             Element *pointer = list_get_pointer(&self->buckets[hash], index);
-            //printf("CAKE\n" );
             assert(pointer->id != NULL);
-            //if (pointer->id != NULL){
-                //printf("CAeKE ><\n");
             if (strcmp(pointer->id, key)==0){
-                printf("CAKE\n" );
                 return index;
             }
-            //}else{
-            //    printf("NOPE\n" );
-            //}
         }
     }
     return 0;
 }
-void dictionary_forget(Dictionary *self, char *key){}
+
+void dictionary_forget(Dictionary *self, char *key){
+    unsigned long hash = hash_cstring(key, self->bucket_count);
+    unsigned long index = dictionary_has_key(self, key);
+    //if (index){
+    //    self->buck
+    //}
+}
+
 void dictionary_forget_all(Dictionary *self, char *key){}
 
 /*

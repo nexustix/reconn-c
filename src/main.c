@@ -8,10 +8,6 @@
 
 int main(int argc, const char *argv[]) {
 
-  printf("+ ><\n");
-  free(NULL);
-  printf("+ ><\n");
-
   unsigned char number1[5] = {1,2,3,4,5};
   Bignum *uno = bignum_from_chars(10, sizeof(number1), number1);
   uno->negative = 0;

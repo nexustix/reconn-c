@@ -9,7 +9,7 @@
 typedef enum {
     KIND_VOID,  // uninitialized
     KIND_EMPTY, // ready for contents
-    KIND_NOTHING, // contains "nothing"
+    //KIND_NOTHING, // contains "nothing"
     KIND_BIGNUM
 }ElementKind;
 
