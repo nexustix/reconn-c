@@ -25,29 +25,41 @@ int main(int argc, const char *argv[]) {
   printf("- >%s<\n", bignum_to_string(r));
   */
 
-  /*
-  List *list = newList(8);
-  //Element *element = newElement();
   Bignum *tre = newBignum(10, 0);
+  //Element *element = newElement();
+  List *list = newList(8);
 
-  list_push_bignum(list, uno);
-  list_push_bignum(list, due);
+  /*
+  element_from_bignum(element, uno);
+  element_to_bignum(element, tre);
+
   printf(">%s<\n", bignum_to_string(uno));
-  printf(">%s<\n", bignum_to_string(due));
   printf(">%s<\n", bignum_to_string(tre));
-  list_pop_bignum(list, tre);
+
   printf(">%s<\n", bignum_to_string(uno));
-  printf(">%s<\n", bignum_to_string(due));
-  printf(">%s<\n", bignum_to_string(tre));
-  list_pop_bignum(list, tre);
-  printf(">%s<\n", bignum_to_string(uno));
-  printf(">%s<\n", bignum_to_string(due));
-  printf(">%s<\n", bignum_to_string(tre));
-  tre->digits[0] = 7;
-  printf(">%s<\n", bignum_to_string(uno));
-  printf(">%s<\n", bignum_to_string(due));
   printf(">%s<\n", bignum_to_string(tre));
   */
+
+  
+  list_push_bignum(list, due);
+  list_push_bignum(list, uno);
+
+  printf("A>%s<\n", bignum_to_string(uno));
+  printf("A>%s<\n", bignum_to_string(due));
+  printf("A>%s<\n", bignum_to_string(tre));
+  list_pop_bignum(list, tre);
+  printf("B>%s<\n", bignum_to_string(uno));
+  printf("B>%s<\n", bignum_to_string(due));
+  printf("B>%s<\n", bignum_to_string(tre));
+  list_pop_bignum(list, tre);
+  printf("C>%s<\n", bignum_to_string(uno));
+  printf("C>%s<\n", bignum_to_string(due));
+  printf("C>%s<\n", bignum_to_string(tre));
+  tre->digits[0] = 7;
+  printf("D>%s<\n", bignum_to_string(uno));
+  printf("D>%s<\n", bignum_to_string(due));
+  printf("D>%s<\n", bignum_to_string(tre));
+  
 
 
   //element_of_bignum(element, uno);

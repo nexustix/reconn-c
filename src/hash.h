@@ -2,7 +2,7 @@
 #define HASH_H
 
 
-unsigned long hash_string(char *string){
+unsigned long hash_cstring_sdbm(char *string){
     unsigned long hash = 0;
     int c;
 
@@ -12,5 +12,8 @@ unsigned long hash_string(char *string){
     return hash;
 }
 
+unsigned long hash_cstring(char* string){
+    return hash_cstring_sdbm(string);
+}
 
 #endif

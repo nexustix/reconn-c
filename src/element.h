@@ -14,16 +14,16 @@ typedef enum {
 }ElementKind;
 
 typedef struct{
-    //void *data;
-    Bignum data;
+    void *data;
+    //Bignum data;
     ElementKind kind;
     //unsigned int size;
 }Element;
 
 Element *newElement(){
     Element *self = (Element *)calloc(1, sizeof(*self));
-    //self->data = NULL;
-    recycleBignum(&self->data);
+    self->data = NULL;
+    //recycleBignum(&self->data);
     self->kind = KIND_EMPTY;
     //self->size = 0;
     return self;
@@ -32,8 +32,8 @@ Element *newElement(){
 void recycleElement(Element *self){
     self->kind = KIND_EMPTY;
     //self->size = 0;
-    //free(self->data);
-    recycleBignum(&self->data);
+    free(self->data);
+    //recycleBignum(&self->data);
 }
 
 
@@ -41,23 +41,27 @@ void copyElement(Element *destination, Element *source){
     // destination->data = source->data;
     // destination->kind = source->kind;
     //memcpy(destination, source, sizeof(Element));
-    copyBignum(&destination->data, &source->data);
-    destination->kind = source->kind;
+    //copyBignum(&destination->data, &source->data);
+
+    //copyBignum(&destination->data, &source->data);
+    //destination->kind = source->kind;
 }
 
 
-void element_to_bignum(Element *self, Bignum *destination){
+void element_as_bignum(Element *self, Bignum *destination){
     //copyBignum(destination, (Bignum*)self->data);
-    copyBignum(destination, &self->data);
+
+    copyBignum(destination, (Bignum*)self->data);
+
 }
 
 void element_from_bignum(Element *self, Bignum *source){
-    //free(self->data);
-    //self->size = sizeof(Bignum);
-    //self->data = malloc(self->size);
     //copyBignum((Bignum*)self->data, source);
-    //self->kind = KIND_BIGNUM;
-    copyBignum(&self->data, source);
+    //recycleElement(self);
+    free(self->data);
+    self->data = malloc(sizeof(Bignum));
+    copyBignum((Bignum*)self->data, source);
+    self->kind = KIND_BIGNUM;
 }
 
 

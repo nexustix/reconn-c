@@ -11,7 +11,7 @@ typedef struct{
     unsigned long bucket_count;
 }Dictionary;
 
-/*
+
 Dictionary *newDictionary(unsigned long bucket_count){
     Dictionary *self = (Dictionary *)calloc(1, sizeof(*self));
     self->bucket_count = bucket_count;
@@ -19,13 +19,23 @@ Dictionary *newDictionary(unsigned long bucket_count){
     return self;
 }
 
-void dictionary_has_key(Dictionary *self, char *key){}
+int dictionary_has_key(Dictionary *self, char *key){
+    unsigned long hash = hash_cstring(key);
+    if (self->buckets[hash].top){
+
+    }
+    return 0;
+}
+void dictionary_forget(Dictionary *self, char *key){}
+void dictionary_forget_all(Dictionary *self, char *key){}
+
+/*
 void dictionary_add(Dictionary *self, char *key, void *value){
     unsigned long bucket_index = hash_string(key) % self->bucket_count;
     //list_push(&self->buckets[bucket_index]);
     
 }
-void dictionary_forget(Dictionary *self, char *key){}
-void dictionary_forget_all(Dictionary *self, char *key){}
 */
+
+
 #endif

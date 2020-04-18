@@ -39,8 +39,13 @@ void list_push_bignum(List *self, Bignum* value){
 }
 
 void list_pop_bignum(List *self, Bignum *result){
-    element_to_bignum(&self->elements[self->top], result);
-    self->top--;
+    if (self->top){
+        element_as_bignum(&self->elements[self->top], result);
+        self->top--;
+    }else{
+        free(result);
+        result = NULL;
+    }
 }
 
 #endif
