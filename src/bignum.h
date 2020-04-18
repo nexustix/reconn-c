@@ -14,33 +14,33 @@ typedef struct {
   unsigned int reserve; // length reserved
 } Bignum;
 
-Bignum *newBignum(unsigned int base, unsigned int initial_length) {
+Bignum *newBignum(unsigned int base) {
+  const unsigned int startlen = 8;
   Bignum *self = (Bignum *)calloc(1, sizeof(*self));
-  self->digits = (unsigned char *)calloc(initial_length, sizeof(char));
+  self->digits = (unsigned char *)calloc(startlen, sizeof(char));
   self->negative = 0;
   self->last = 0;
   self->base = base;
-  self->reserve = initial_length;
+  self->reserve = startlen;
   return self;
 }
 
-void bignum_resize(Bignum *self, unsigned int size) {
-  self->digits = (unsigned char *)realloc(self->digits, size);
-}
-
-void recycleBignum(Bignum* self){
-  self->negative = 0;
-  self->last = 0;
-  if (self->reserve > 16){
+void oldBignum(Bignum* self, unsigned int base){
+  const unsigned int maxlen = 16;
+  if (self->reserve > maxlen){
     free(self->digits);
-    self->digits = (unsigned char *)malloc(16);
+    self->digits = (unsigned char *)malloc(maxlen);
+    self->reserve = maxlen;
   }//else if(!self->reserve){
   //  self->digits = (unsigned char *)malloc(0);
   //  self->reserve = 0;
   //}
+  self->negative = 0;
+  self->last = 0;
+  self->base = base;
 }
 
-void copyBignum(Bignum* destination, Bignum* source){
+void dupBignum(Bignum* destination, Bignum* source){
   //bignum_resize(destination, source->last+1);
   free(destination->digits);
   destination->digits = (unsigned char*)malloc(source->last+1);
@@ -51,8 +51,14 @@ void copyBignum(Bignum* destination, Bignum* source){
   destination->reserve = source->last+1;
 }
 
+void bignum_resize(Bignum *self, unsigned int size) {
+  self->digits = (unsigned char *)realloc(self->digits, size);
+}
+
 Bignum *bignum_from_chars(unsigned int base, unsigned int size, unsigned char digits[]) {
-  Bignum *self = newBignum(base, size);
+  //Bignum *self = newBignum(base, size);
+  Bignum *self = (Bignum*)calloc(1, sizeof(Bignum));
+  bignum_resize(self, size);
   self->last = size - 1;
   for (unsigned int i = 0; i < size; i++) {
     self->digits[i] = digits[(size - 1) - i];

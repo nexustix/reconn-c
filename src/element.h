@@ -18,25 +18,29 @@ typedef struct{
     //Bignum data;
     ElementKind kind;
     //unsigned int size;
+    char *id;
 }Element;
 
 Element *newElement(){
     Element *self = (Element *)calloc(1, sizeof(*self));
     self->data = NULL;
+    self->id = NULL;
     //recycleBignum(&self->data);
     self->kind = KIND_EMPTY;
     //self->size = 0;
     return self;
 }
 
+/*
 void recycleElement(Element *self){
     self->kind = KIND_EMPTY;
     //self->size = 0;
     free(self->data);
     //recycleBignum(&self->data);
 }
+*/
 
-
+/*
 void copyElement(Element *destination, Element *source){
     // destination->data = source->data;
     // destination->kind = source->kind;
@@ -46,12 +50,12 @@ void copyElement(Element *destination, Element *source){
     //copyBignum(&destination->data, &source->data);
     //destination->kind = source->kind;
 }
-
+*/
 
 void element_as_bignum(Element *self, Bignum *destination){
     //copyBignum(destination, (Bignum*)self->data);
 
-    copyBignum(destination, (Bignum*)self->data);
+    dupBignum(destination, (Bignum*)self->data);
 
 }
 
@@ -60,7 +64,7 @@ void element_from_bignum(Element *self, Bignum *source){
     //recycleElement(self);
     free(self->data);
     self->data = malloc(sizeof(Bignum));
-    copyBignum((Bignum*)self->data, source);
+    dupBignum((Bignum*)self->data, source);
     self->kind = KIND_BIGNUM;
 }
 

@@ -4,8 +4,13 @@
 #include "bignum.h"
 #include "list.h"
 #include "element.h"
+#include "dictionary.h"
 
 int main(int argc, const char *argv[]) {
+
+  printf("+ ><\n");
+  free(NULL);
+  printf("+ ><\n");
 
   unsigned char number1[5] = {1,2,3,4,5};
   Bignum *uno = bignum_from_chars(10, sizeof(number1), number1);
@@ -25,9 +30,19 @@ int main(int argc, const char *argv[]) {
   printf("- >%s<\n", bignum_to_string(r));
   */
 
-  Bignum *tre = newBignum(10, 0);
+  Bignum *tre = newBignum(10);
   //Element *element = newElement();
   List *list = newList(8);
+
+  Dictionary *dictionary = newDictionary(1);
+
+  dictionary_add_bignum(dictionary, "bob", tre);
+  dictionary_add_bignum(dictionary, "steve", tre);
+  unsigned long bob = dictionary_has_key(dictionary, "bob");
+  unsigned long steve = dictionary_has_key(dictionary, "steve");
+
+  printf(">%lu<\n", bob);
+  printf(">%lu<\n", steve);
 
   /*
   element_from_bignum(element, uno);
@@ -40,7 +55,7 @@ int main(int argc, const char *argv[]) {
   printf(">%s<\n", bignum_to_string(tre));
   */
 
-  
+  /*
   list_push_bignum(list, due);
   list_push_bignum(list, uno);
 
@@ -59,6 +74,7 @@ int main(int argc, const char *argv[]) {
   printf("D>%s<\n", bignum_to_string(uno));
   printf("D>%s<\n", bignum_to_string(due));
   printf("D>%s<\n", bignum_to_string(tre));
+  */
   
 
 

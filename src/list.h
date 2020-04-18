@@ -9,15 +9,16 @@
 typedef struct{
     Element *elements;
     unsigned long top;
-    unsigned long size;
+    unsigned long reserve;
 }List;
 
 
 List *newList(unsigned long initial_size){
     List *self = (List*)calloc(1, sizeof(*self));
-    self->size = initial_size;
+    self->reserve = initial_size;
     self->top = 0;
-    self->elements = (Element*)calloc(self->size, self->size*sizeof(Element));
+    //self->elements = (Element*)calloc(self->reserve, self->size*sizeof(Element));
+    self->elements = (Element*)calloc(self->reserve, sizeof(Element));
     self->elements[0].kind = KIND_NOTHING;
     return self;
 }
@@ -31,7 +32,7 @@ int list_is_empty(List *self){
 }
 
 void list_push_bignum(List *self, Bignum* value){
-    if (self->top+2 > self->size) {
+    if (self->top+2 > self->reserve) {
         list_resize(self, self->top+2);
     }
     self->top++;
@@ -46,6 +47,17 @@ void list_pop_bignum(List *self, Bignum *result){
         free(result);
         result = NULL;
     }
+}
+
+void list_set_id(List *self, unsigned long index, char* id){
+    free(self->elements[self->top].id);
+    self->elements[self->top].id = (char *)malloc(strlen(id));
+    strcpy(self->elements[self->top].id, id);
+}
+
+Element *list_get_pointer(List *self, unsigned long index){
+    assert(index <= self->top);
+    return &self->elements[index];
 }
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
 
+#include <stdio.h>
+
 #include <stdlib.h>
 #include "list.h"
 #include "hash.h"
@@ -19,10 +21,27 @@ Dictionary *newDictionary(unsigned long bucket_count){
     return self;
 }
 
-int dictionary_has_key(Dictionary *self, char *key){
-    unsigned long hash = hash_cstring(key);
+unsigned long dictionary_has_key(Dictionary *self, char *key){
+    unsigned long hash = hash_cstring(key, self->bucket_count);
     if (self->buckets[hash].top){
-
+        //printf("}%lu{\n", );
+        //printf("CAKE\n" );
+        for (unsigned long i=0; i < self->buckets[hash].top; i++){
+            unsigned long index = self->buckets[hash].top - i;
+            //printf("}%lu{}%lu{\n", i, index);
+            Element *pointer = list_get_pointer(&self->buckets[hash], index);
+            //printf("CAKE\n" );
+            assert(pointer->id != NULL);
+            //if (pointer->id != NULL){
+                //printf("CAeKE ><\n");
+            if (strcmp(pointer->id, key)==0){
+                printf("CAKE\n" );
+                return index;
+            }
+            //}else{
+            //    printf("NOPE\n" );
+            //}
+        }
     }
     return 0;
 }
@@ -36,6 +55,15 @@ void dictionary_add(Dictionary *self, char *key, void *value){
     
 }
 */
+
+void dictionary_add_bignum(Dictionary *self, char *key, Bignum* value){
+    unsigned long hash = hash_cstring(key, self->bucket_count);
+    list_push_bignum(&self->buckets[hash], value);
+    list_set_id(&self->buckets[hash], self->buckets[hash].top, key);
+    //strcpy()
+    //self->buckets[hash]->elements[self->buckets[hash].top].id = key;
+    //strcpy(self->buckets[hash].elements[self->buckets[hash].top].id, key);
+}
 
 
 #endif
