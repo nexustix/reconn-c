@@ -86,7 +86,7 @@ void bignum_set_digit(Bignum *self, unsigned int index, unsigned char digit) {
   }
 }
 
-char *bignum_to_string(Bignum *self) {
+char *bignum_to_cstring(Bignum *self) {
   char *s;
   unsigned int pointer = 1;
   char *tmp = (char *)malloc(1);

@@ -84,6 +84,12 @@ void list_set_at(List *self, unsigned long index, Element *value) {
     self->elements[index].id = value->id;
 }
 
+Element *list_get_at(List *self, unsigned long index){
+    assert(index <= self->top);
+    return (Element *)&self->elements[index];
+}
+
+
 void list_remove_at(List *self, unsigned long index) {
     //assert(index <= self->top);
     assert(index < self->reserve);
@@ -130,9 +136,5 @@ void list_set_id(List *self, unsigned long index, char* id){
     strcpy(self->elements[self->top].id, id);
 }
 
-Element *list_get_pointer(List *self, unsigned long index){
-    assert(index <= self->top);
-    return (Element *)&self->elements[index];
-}
 
 #endif

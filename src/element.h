@@ -69,11 +69,11 @@ void element_from_bignum(Element *self, Bignum *source){
 }
 */
 
-Bignum *element_as_bignum(Element *self){
+Bignum *element_get_bignum(Element *self){
     return (Bignum*)self->data;
 }
 
-Element *element_from_bignum(Element *destination, Bignum *source){
+Element *element_set_bignum(Element *destination, Bignum *source){
     destination->data = (void*)source;
     destination->kind = KIND_BIGNUM;
     return destination;

@@ -41,21 +41,21 @@ int main(int argc, const char *argv[]) {
   Element *ele = newElement();
 
   dictionary_add(dict, "bob",
-                 element_from_bignum(
+                 element_set_bignum(
                      ele, bignum_from_chars(10, sizeof(number1), number1)));
   dictionary_add(dict, "bob",
-                element_from_bignum(
+                element_set_bignum(
                     ele, bignum_from_chars(10, sizeof(number2), number2)));
   dictionary_add(dict, "bob",
-                element_from_bignum(
+                element_set_bignum(
                     ele, bignum_from_chars(10, sizeof(number1), number1)));
   free(ele);
 
-  printf("a>%s\n", bignum_to_string(element_as_bignum(dictionary_get_pointer(dict, "bob"))));
+  printf("a>%s\n", bignum_to_cstring(element_get_bignum(dictionary_get(dict, "bob"))));
   dictionary_forget(dict, "bob");
-  printf("b>%s\n", bignum_to_string(element_as_bignum(dictionary_get_pointer(dict, "bob"))));
+  printf("b>%s\n", bignum_to_cstring(element_get_bignum(dictionary_get(dict, "bob"))));
   dictionary_forget(dict, "bob");
-  printf("c>%s\n", bignum_to_string(element_as_bignum(dictionary_get_pointer(dict, "bob"))));
+  printf("c>%s\n", bignum_to_cstring(element_get_bignum(dictionary_get(dict, "bob"))));
 
   
   //printf(">%d<\n", testa->kind);

@@ -26,7 +26,7 @@ unsigned long dictionary_has_key(Dictionary *self, char *key){
     if (self->buckets[hash].top){
         for (unsigned long i=0; i < self->buckets[hash].top; i++){
             unsigned long index = self->buckets[hash].top - i;
-            Element *pointer = list_get_pointer(&self->buckets[hash], index);
+            Element *pointer = list_get_at(&self->buckets[hash], index);
             assert(pointer->id != NULL);
             if ((pointer->kind != KIND_EMPTY) && strcmp(pointer->id, key)==0){
                 return index;
@@ -73,11 +73,11 @@ void dictionary_add(Dictionary *self, char *key, Element *value){
     list_set_id(&self->buckets[hash], index, key);
 }
 
-Element *dictionary_get_pointer(Dictionary *self, char *key) {
+Element *dictionary_get(Dictionary *self, char *key) {
     unsigned long hash = hash_cstring(key, self->bucket_count);
     unsigned long index = dictionary_has_key(self, key);
     if (index){
-        return list_get_pointer(&self->buckets[hash], index);
+        return list_get_at(&self->buckets[hash], index);
     }
     return NULL;
 }
