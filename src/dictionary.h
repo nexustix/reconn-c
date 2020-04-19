@@ -28,7 +28,7 @@ unsigned long dictionary_has_key(Dictionary *self, char *key){
             unsigned long index = self->buckets[hash].top - i;
             Element *pointer = list_get_pointer(&self->buckets[hash], index);
             assert(pointer->id != NULL);
-            if (strcmp(pointer->id, key)==0){
+            if ((pointer->kind != KIND_EMPTY) && strcmp(pointer->id, key)==0){
                 return index;
             }
         }
@@ -36,15 +36,18 @@ unsigned long dictionary_has_key(Dictionary *self, char *key){
     return 0;
 }
 
-void dictionary_forget(Dictionary *self, char *key){
+int dictionary_forget(Dictionary *self, char *key){
     unsigned long hash = hash_cstring(key, self->bucket_count);
     unsigned long index = dictionary_has_key(self, key);
-    //if (index){
-    //    self->buck
-    //}
+    if (index){
+        list_remove_at(&self->buckets[hash], index);
+    }
+    return index;
 }
 
-void dictionary_forget_all(Dictionary *self, char *key){}
+void dictionary_forget_all(Dictionary *self, char *key){
+    while(dictionary_forget(self, key));
+}
 
 /*
 void dictionary_add(Dictionary *self, char *key, void *value){
@@ -53,7 +56,7 @@ void dictionary_add(Dictionary *self, char *key, void *value){
     
 }
 */
-
+/*
 void dictionary_add_bignum(Dictionary *self, char *key, Bignum* value){
     unsigned long hash = hash_cstring(key, self->bucket_count);
     list_push_bignum(&self->buckets[hash], value);
@@ -62,6 +65,24 @@ void dictionary_add_bignum(Dictionary *self, char *key, Bignum* value){
     //self->buckets[hash]->elements[self->buckets[hash].top].id = key;
     //strcpy(self->buckets[hash].elements[self->buckets[hash].top].id, key);
 }
+*/
+
+void dictionary_add(Dictionary *self, char *key, Element *value){
+    unsigned long hash = hash_cstring(key, self->bucket_count);
+    unsigned long index = list_insert(&self->buckets[hash], value);
+    list_set_id(&self->buckets[hash], index, key);
+}
+
+Element *dictionary_get_pointer(Dictionary *self, char *key) {
+    unsigned long hash = hash_cstring(key, self->bucket_count);
+    unsigned long index = dictionary_has_key(self, key);
+    if (index){
+        return list_get_pointer(&self->buckets[hash], index);
+    }
+    return NULL;
+}
+
+//void di
 
 
 #endif

@@ -9,14 +9,13 @@
 typedef enum {
     KIND_VOID,  // uninitialized
     KIND_EMPTY, // ready for contents
-    //KIND_NOTHING, // contains "nothing"
     KIND_BIGNUM
 }ElementKind;
 
 typedef struct{
+    ElementKind kind;
     void *data;
     //Bignum data;
-    ElementKind kind;
     //unsigned int size;
     char *id;
 }Element;
@@ -52,6 +51,7 @@ void copyElement(Element *destination, Element *source){
 }
 */
 
+/*
 void element_as_bignum(Element *self, Bignum *destination){
     //copyBignum(destination, (Bignum*)self->data);
 
@@ -67,7 +67,16 @@ void element_from_bignum(Element *self, Bignum *source){
     dupBignum((Bignum*)self->data, source);
     self->kind = KIND_BIGNUM;
 }
+*/
 
+Bignum *element_as_bignum(Element *self){
+    return (Bignum*)self->data;
+}
 
+Element *element_from_bignum(Element *destination, Bignum *source){
+    destination->data = (void*)source;
+    destination->kind = KIND_BIGNUM;
+    return destination;
+}
 
 #endif

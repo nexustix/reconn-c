@@ -1,7 +1,18 @@
 #ifndef HASH_H
 #define HASH_H
 
-unsigned long hash_cstring_sdbm(char *string) {
+unsigned long hash_cstring_djb2(unsigned char *str) {
+  unsigned long hash = 5381;
+  int c;
+
+  while (c = *str++)
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+  return hash;
+}
+
+
+unsigned long hash_cstring_sdbm(unsigned char *string) {
   unsigned long hash = 0;
   int c;
 
@@ -11,18 +22,18 @@ unsigned long hash_cstring_sdbm(char *string) {
   return hash;
 }
 
-// unsigned long hash_cstring_djb2(unsigned char *str) {
-//  unsigned long hash = 5381;
-//  int c;
-//
-//  while (c = *str++)
-//    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-//
-//  return hash;
-//}
-
 unsigned long hash_cstring(char *string, unsigned long bucket_count) {
-  return hash_cstring_sdbm(string) % bucket_count;
+  switch (bucket_count) {
+  case 0xf:
+  case 0xff:
+  case 0xfff:
+  case 0xffff:
+    return hash_cstring_sdbm((unsigned char*)string) & bucket_count;
+    break;
+  default:
+    return hash_cstring_sdbm((unsigned char*)string) % bucket_count;
+    break;
+  }
 }
 
 #endif
