@@ -1,33 +1,37 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "bignum.h"
 
-
 typedef enum {
-    KIND_VOID,  // uninitialized
-    KIND_EMPTY, // ready for contents
-    KIND_BIGNUM
-}ElementKind;
+  KIND_VOID,   // uninitialized
+  KIND_EMPTY,  // ready for contents
+  KIND_BIGNUM,
+  KIND_WORD_PRIMARY,
+  KIND_WORD_SECONDARY,
+  KIND_INT,
+  KIND_CSTRING,
+} ElementKind;
 
-typedef struct{
-    ElementKind kind;
-    void *data;
-    //Bignum data;
-    //unsigned int size;
-    char *id;
-}Element;
+typedef struct {
+  ElementKind kind;
+  void* data;
+  // Bignum data;
+  // unsigned int size;
+  char* id;
+} Element;
 
-Element *newElement(){
-    Element *self = (Element *)calloc(1, sizeof(*self));
-    self->data = NULL;
-    self->id = NULL;
-    //recycleBignum(&self->data);
-    self->kind = KIND_EMPTY;
-    //self->size = 0;
-    return self;
+Element* newElement() {
+  Element* self = (Element*)calloc(1, sizeof(*self));
+  self->data = NULL;
+  self->id = NULL;
+  // recycleBignum(&self->data);
+  self->kind = KIND_EMPTY;
+  // self->size = 0;
+  return self;
 }
 
 /*
@@ -69,14 +73,28 @@ void element_from_bignum(Element *self, Bignum *source){
 }
 */
 
-Bignum *element_get_bignum(Element *self){
-    return (Bignum*)self->data;
+Bignum* element_get_bignum(Element* self) { return (Bignum*)self->data; }
+
+Element* element_set_bignum(Element* destination, Bignum* source) {
+  destination->data = (void*)source;
+  destination->kind = KIND_BIGNUM;
+  return destination;
 }
 
-Element *element_set_bignum(Element *destination, Bignum *source){
-    destination->data = (void*)source;
-    destination->kind = KIND_BIGNUM;
-    return destination;
+int* element_get_int(Element* self) { return (int*)self->data; }
+
+Element* element_set_int(Element* destination, int* source) {
+  destination->data = (void*)source;
+  destination->kind = KIND_INT;
+  return destination;
+}
+
+char* element_get_cstring(Element* self) { return (char*)self->data; }
+
+Element* element_set_cstring(Element* destination, char* source) {
+  destination->data = (void*)source;
+  destination->kind = KIND_INT;
+  return destination;
 }
 
 #endif

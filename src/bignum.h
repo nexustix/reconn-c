@@ -1,23 +1,23 @@
 #ifndef BIGNUM_H
 #define BIGNUM_H
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 
 typedef struct {
-  unsigned char *digits;
-  int negative;         // is number negative (boolean)
-  unsigned int last;    // index of last element
-  unsigned int base;    // base of number
-  unsigned int reserve; // length reserved
+  unsigned char* digits;
+  int negative;          // is number negative (boolean)
+  unsigned int last;     // index of last element
+  unsigned int base;     // base of number
+  unsigned int reserve;  // length reserved
 } Bignum;
 
-Bignum *newBignum(unsigned int base) {
+Bignum* newBignum(unsigned int base) {
   const unsigned int startlen = 8;
-  Bignum *self = (Bignum *)calloc(1, sizeof(*self));
-  self->digits = (unsigned char *)calloc(startlen, sizeof(char));
+  Bignum* self = (Bignum*)calloc(1, sizeof(*self));
+  self->digits = (unsigned char*)calloc(startlen, sizeof(char));
   self->negative = 0;
   self->last = 0;
   self->base = base;
@@ -25,13 +25,13 @@ Bignum *newBignum(unsigned int base) {
   return self;
 }
 
-void oldBignum(Bignum* self, unsigned int base){
+void oldBignum(Bignum* self, unsigned int base) {
   const unsigned int maxlen = 16;
-  if (self->reserve > maxlen){
+  if (self->reserve > maxlen) {
     free(self->digits);
-    self->digits = (unsigned char *)malloc(maxlen);
+    self->digits = (unsigned char*)malloc(maxlen);
     self->reserve = maxlen;
-  }//else if(!self->reserve){
+  }  // else if(!self->reserve){
   //  self->digits = (unsigned char *)malloc(0);
   //  self->reserve = 0;
   //}
@@ -40,24 +40,25 @@ void oldBignum(Bignum* self, unsigned int base){
   self->base = base;
 }
 
-void dupBignum(Bignum* destination, Bignum* source){
-  //bignum_resize(destination, source->last+1);
+void dupBignum(Bignum* destination, Bignum* source) {
+  // bignum_resize(destination, source->last+1);
   free(destination->digits);
-  destination->digits = (unsigned char*)malloc(source->last+1);
-  memcpy(destination->digits, source->digits, source->last+1);
+  destination->digits = (unsigned char*)malloc(source->last + 1);
+  memcpy(destination->digits, source->digits, source->last + 1);
   destination->negative = source->negative;
   destination->last = source->last;
   destination->base = source->base;
-  destination->reserve = source->last+1;
+  destination->reserve = source->last + 1;
 }
 
-void bignum_resize(Bignum *self, unsigned int size) {
-  self->digits = (unsigned char *)realloc(self->digits, size);
+void bignum_resize(Bignum* self, unsigned int size) {
+  self->digits = (unsigned char*)realloc(self->digits, size);
 }
 
-Bignum *bignum_from_chars(unsigned int base, unsigned int size, unsigned char digits[]) {
-  //Bignum *self = newBignum(base, size);
-  Bignum *self = (Bignum*)calloc(1, sizeof(Bignum));
+Bignum* bignum_from_chars(unsigned int base, unsigned int size,
+                          unsigned char digits[]) {
+  // Bignum *self = newBignum(base, size);
+  Bignum* self = (Bignum*)calloc(1, sizeof(Bignum));
   bignum_resize(self, size);
   self->last = size - 1;
   for (unsigned int i = 0; i < size; i++) {
@@ -66,17 +67,17 @@ Bignum *bignum_from_chars(unsigned int base, unsigned int size, unsigned char di
   return self;
 }
 
-void bignum_clean_zeroes(Bignum *self){
-  for (unsigned int i=0; i <= self->last; i++){
-    if (self->digits[self->last-i] == 0){
-      self->last --;
-    }else{
+void bignum_clean_zeroes(Bignum* self) {
+  for (unsigned int i = 0; i <= self->last; i++) {
+    if (self->digits[self->last - i] == 0) {
+      self->last--;
+    } else {
       return;
     }
   }
 }
 
-void bignum_set_digit(Bignum *self, unsigned int index, unsigned char digit) {
+void bignum_set_digit(Bignum* self, unsigned int index, unsigned char digit) {
   if (self->reserve < index + 1) {
     bignum_resize(self, index + 1);
   }
@@ -86,14 +87,14 @@ void bignum_set_digit(Bignum *self, unsigned int index, unsigned char digit) {
   }
 }
 
-char *bignum_to_cstring(Bignum *self) {
-  char *s;
+char* bignum_to_cstring(Bignum* self) {
+  char* s;
   unsigned int pointer = 1;
-  char *tmp = (char *)malloc(1);
+  char* tmp = (char*)malloc(1);
   if (self->base > 10) {
-    s = (char *)malloc(((self->last + 1) * 2) + 1 + 1);
+    s = (char*)malloc(((self->last + 1) * 2) + 1 + 1);
   } else {
-    s = (char *)malloc((self->last + 1) + 1 + 1);
+    s = (char*)malloc((self->last + 1) + 1 + 1);
   }
 
   if (self->negative) {
@@ -121,7 +122,7 @@ char *bignum_to_cstring(Bignum *self) {
   return s;
 }
 
-int bignum_smaller_abs(Bignum *a, Bignum *b) {
+int bignum_smaller_abs(Bignum* a, Bignum* b) {
   if (a->last > b->last) {
     return 1;
   } else if (a->last < b->last) {
@@ -138,7 +139,7 @@ int bignum_smaller_abs(Bignum *a, Bignum *b) {
   return 2;
 }
 
-void bignum_blind_add(Bignum *r, Bignum *a, Bignum *b) {
+void bignum_blind_add(Bignum* r, Bignum* a, Bignum* b) {
   // FIXME assert base 10
   if (bignum_smaller_abs(a, b)) {
     bignum_resize(r, a->last + 1);
@@ -166,7 +167,7 @@ void bignum_blind_add(Bignum *r, Bignum *a, Bignum *b) {
   }
 }
 
-void bignum_blind_sub(Bignum *r, Bignum *a, Bignum *b) {
+void bignum_blind_sub(Bignum* r, Bignum* a, Bignum* b) {
   // FIXME assert base 10
   if (bignum_smaller_abs(a, b)) {
     bignum_resize(r, a->last + 1);
@@ -194,37 +195,37 @@ void bignum_blind_sub(Bignum *r, Bignum *a, Bignum *b) {
   }
 }
 
-void bignum_add(Bignum *r, Bignum *a, Bignum *b) {
+void bignum_add(Bignum* r, Bignum* a, Bignum* b) {
   r->negative = 0;
-  if (a->negative == b->negative){
-    if (!a->negative){
+  if (a->negative == b->negative) {
+    if (!a->negative) {
       bignum_blind_add(r, a, b);
-    }else{
+    } else {
       bignum_blind_add(r, a, b);
       r->negative = 1;
     }
-  }else{
-    if (!a->negative){
-      bignum_blind_sub(r,a,b);
-    }else{
-      bignum_blind_sub(r,b,a);
+  } else {
+    if (!a->negative) {
+      bignum_blind_sub(r, a, b);
+    } else {
+      bignum_blind_sub(r, b, a);
     }
   }
 }
 
-void bignum_sub(Bignum *r, Bignum *a, Bignum *b) {
+void bignum_sub(Bignum* r, Bignum* a, Bignum* b) {
   r->negative = 0;
-  if (a->negative == b->negative){
-    if (!a->negative){
+  if (a->negative == b->negative) {
+    if (!a->negative) {
       bignum_blind_sub(r, a, b);
-    }else{
+    } else {
       bignum_blind_sub(r, b, a);
     }
-  }else{
-    if (!a->negative){
-      bignum_blind_add(r,a,b);
-    }else{
-      bignum_blind_add(r,a,b);
+  } else {
+    if (!a->negative) {
+      bignum_blind_add(r, a, b);
+    } else {
+      bignum_blind_add(r, a, b);
       r->negative = 1;
     }
   }
