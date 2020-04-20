@@ -14,20 +14,20 @@ int main(int argc, const char* argv[]) {
 
   VM *pip = newVM();
 
-  List *wiking = newList(16);
-  list_push(wiking, element_set_cstring(e, "spam"));
-  list_push(wiking, element_set_cstring(e, "spam"));
-  list_push(wiking, element_set_cstring(e, "spam"));
-  list_push(wiking, element_set_cstring(e, "wonderful"));
-  list_push(wiking, element_set_cstring(e, "spam"));
-  list_push(wiking, element_set_cstring(e, "wonderful"));
-  list_push(wiking, element_set_cstring(e, "wonderful"));
+  List *viking = newList(16);
+  list_push(viking, element_set_cstring(e, "spam"));
+  list_push(viking, element_set_cstring(e, "spam"));
+  list_push(viking, element_set_cstring(e, "spam"));
+  list_push(viking, element_set_cstring(e, "wonderful"));
+  list_push(viking, element_set_cstring(e, "spam"));
+  list_push(viking, element_set_cstring(e, "wonderful"));
+  list_push(viking, element_set_cstring(e, "wonderful"));
   
   vm_add_primary(pip, "spam", _spam);
   vm_add_primary(pip, "wonderful", _wonderful);
-  vm_add_secondary(pip, "wiking", wiking);
+  vm_add_secondary(pip, "viking", viking);
 
-  vm_do(pip, "wiking");
+  vm_do(pip, "viking");
 
   vm_run(pip);
 
