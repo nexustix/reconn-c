@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
+typedef struct Bignum{
   unsigned char* digits;
   int negative;          // is number negative (boolean)
   unsigned int last;     // index of last element

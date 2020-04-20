@@ -6,7 +6,7 @@
 
 #include "element.h"
 
-typedef struct {
+typedef struct List{
   Element* elements;
   unsigned long top;
   unsigned long reserve;
@@ -19,8 +19,8 @@ List* newList(unsigned long initial_size) {
   // self->elements = (Element*)calloc(self->reserve,
   // self->size*sizeof(Element));
   self->elements = (Element*)calloc(self->reserve, sizeof(Element));
-  // self->elements[0].kind = KIND_NOTHING;
-  self->elements[0].kind = KIND_VOID;
+  // self->elements[0].kind = ELEMENT_NOTHING;
+  self->elements[0].kind = ELEMENT_VOID;
   return self;
 }
 
@@ -69,8 +69,8 @@ ElementKind list_pop(List *self, void *value){
         return self->elements[self->top].kind;
     }else{
         value = NULL;
-        //kind = KIND_EMPTY;
-        return KIND_EMPTY;
+        //kind = ELEMENT_EMPTY;
+        return ELEMENT_EMPTY;
     }
 }
 */
@@ -90,7 +90,7 @@ Element* list_get_at(List* self, unsigned long index) {
 void list_remove_at(List* self, unsigned long index) {
   // assert(index <= self->top);
   assert(index < self->reserve);
-  self->elements[index].kind = KIND_EMPTY;
+  self->elements[index].kind = ELEMENT_EMPTY;
 }
 
 void list_push(List* self, Element* value) {
@@ -102,23 +102,24 @@ void list_push(List* self, Element* value) {
   list_set_at(self, self->top, value);
 }
 
-void list_pop(List* self, Element* value) {
+Element* list_pop(List* self, Element* value) {
   if (self->top) {
     value->data = self->elements[self->top].data;
     value->kind = self->elements[self->top].kind;
     value->id = self->elements[self->top].id;
-    self->elements[self->top].kind = KIND_EMPTY;
+    self->elements[self->top].kind = ELEMENT_EMPTY;
     self->top--;
   } else {
     value->data = NULL;
-    value->kind = KIND_EMPTY;
+    value->kind = ELEMENT_EMPTY;
     value->id = NULL;
   }
+  return value;
 }
 
 unsigned long list_insert(List* self, Element* value) {
   for (unsigned long i = 1; i < self->top; i++) {
-    if (self->elements[i].kind == KIND_EMPTY) {
+    if (self->elements[i].kind == ELEMENT_EMPTY) {
       list_set_at(self, i, value);
       return i;
     }

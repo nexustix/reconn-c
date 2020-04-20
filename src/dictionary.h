@@ -8,7 +8,7 @@
 #include "hash.h"
 #include "list.h"
 
-typedef struct {
+typedef struct Dictionary {
   List* buckets;
   unsigned long bucket_count;
 } Dictionary;
@@ -27,7 +27,7 @@ unsigned long dictionary_has_key(Dictionary* self, char* key) {
       unsigned long index = self->buckets[hash].top - i;
       Element* pointer = list_get_at(&self->buckets[hash], index);
       assert(pointer->id != NULL);
-      if ((pointer->kind != KIND_EMPTY) && strcmp(pointer->id, key) == 0) {
+      if ((pointer->kind != ELEMENT_EMPTY) && strcmp(pointer->id, key) == 0) {
         return index;
       }
     }
