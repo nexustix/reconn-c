@@ -2,9 +2,14 @@
 #define VEEM_H
 
 //#include <stdlib.h>
+#include <string.h>
 #include "dictionary.h"
 #include "element.h"
 #include "list.h"
+
+
+#define TOKEN_DEF "def"
+#define TOKEN_END "end"
 
 typedef enum {
   STATE_NORMAL,
@@ -30,8 +35,10 @@ typedef struct VM {
 
   List* word_buffer;
 
-  unsigned int comment;
+  int comment;
   int running;
+
+  unsigned int base;
 } VM;
 
 void (*element_get_pword(Element* self))(VM*) {
@@ -81,6 +88,24 @@ StateKind vm_state(VM* self) {
   // return STATE_NORMAL;
 }
 
+void vm_state_push(VM* self, StateKind state){
+  static Element* e;
+  if (!e) e = newElement();
+  StateKind *tmp = malloc(sizeof(StateKind));
+  *tmp = state;
+  list_push(self->state_stack, element_set_int(e, (int*)tmp));
+}
+
+StateKind vm_state_pop(VM* self){
+  static Element* e;
+  if (!e) e = newElement();
+  assert(!list_is_empty(self->state_stack));
+  StateKind *state = (StateKind*)element_get_int(list_pop(self->state_stack, e));
+  return *state;
+  free(state);
+  //return (StateKind)*element_get_int(list_pop(self->state_stack, e));
+}
+
 void vm_add_primary(VM* self, char* token, void (*callback)(VM*)) {
   static Element* e;
   if (!e) e = newElement();
@@ -97,9 +122,36 @@ void vm_add_secondary(VM* self, char* token, List* source) {
                  element_set_sword(e, source));
 }
 
+void vm_add_compile(VM* self, char* token, void (*callback)(VM*)) {
+  static Element* e;
+  if (!e) e = newElement();
+  e->kind = ELEMENT_WORD_PRIMARY;
+  dictionary_add(self->dictionaries[STATE_COMPILE], token,
+                 element_set_pword(e, callback));
+}
+
+void vm_wordbuffer_push(VM* self, char *token){
+  static Element* e;
+  if (!e) e = newElement();
+  list_push(self->word_buffer, element_set_cstring(e, token));
+}
+char *vm_wordbuffer_pop(VM *self){
+  static Element* e;
+  if (!e) e = newElement();
+  return element_get_cstring(list_pop(self->word_buffer, e));
+}
+
 void vm_do(VM* self, char* token) {
   static Element* e;
   if (!e) e = newElement();
+
+  if (strcmp("(", token) ==0) self->comment++;
+  else if (strcmp(")", token) ==0){
+    self->comment--;
+    assert(self->comment >= 0);
+  }
+  if (self->comment) return;
+
   int state = vm_state(self);
   switch (state) {
     case STATE_NORMAL:
@@ -110,20 +162,33 @@ void vm_do(VM* self, char* token) {
         } else if (e->kind == ELEMENT_WORD_SECONDARY) {
           List* words = element_get_sword(e);
           for (unsigned long i = 0; i < words->top; i++) {
-            // list_pop(self->run_stack, element_set_cstring(e, ))
             e = list_get_at(words, words->top - i);
-            //printf("%d-%lu\n",tmp->kind, words->top - i);
             assert(e->kind == ELEMENT_CSTRING);
             list_push(self->run_stack, e);
           }
         }
+      } else {
+        printf("no idea what >%s< means\n", token);
+        //TODO turn words into values
       }
       break;
 
     case STATE_COMPILE:
+      if (dictionary_has_key(self->dictionaries[STATE_COMPILE], token)) {
+        e = dictionary_get(self->dictionaries[STATE_COMPILE], token);
+        assert(e->kind == ELEMENT_WORD_PRIMARY);
+        element_get_pword(e)(self);
+      }else{
+        list_push(self->word_buffer, element_set_cstring(e, token));
+      }
       break;
 
     case STATE_HARD:
+      if (strcmp(TOKEN_END, token)){
+        vm_state_pop(self);
+      }else{
+        list_push(self->word_buffer, element_set_cstring(e, token));
+      }
       break;
 
     default:
