@@ -6,6 +6,7 @@
 #include "dictionary.h"
 #include "element.h"
 #include "list.h"
+#include "util.h"
 
 
 #define TOKEN_DEF "def"
@@ -91,6 +92,7 @@ StateKind vm_state(VM* self) {
 void vm_state_push(VM* self, StateKind state){
   static Element* e;
   if (!e) e = newElement();
+
   StateKind *tmp = malloc(sizeof(StateKind));
   *tmp = state;
   list_push(self->state_stack, element_set_int(e, (int*)tmp));
@@ -99,7 +101,9 @@ void vm_state_push(VM* self, StateKind state){
 StateKind vm_state_pop(VM* self){
   static Element* e;
   if (!e) e = newElement();
-  assert(!list_is_empty(self->state_stack));
+
+  //assert(!list_is_empty(self->state_stack));
+  error(!list_is_empty(self->state_stack), "tried popping from empty state stack");
   StateKind *state = (StateKind*)element_get_int(list_pop(self->state_stack, e));
   return *state;
   free(state);
@@ -109,6 +113,7 @@ StateKind vm_state_pop(VM* self){
 void vm_add_primary(VM* self, char* token, void (*callback)(VM*)) {
   static Element* e;
   if (!e) e = newElement();
+
   e->kind = ELEMENT_WORD_PRIMARY;
   dictionary_add(self->dictionaries[STATE_NORMAL], token,
                  element_set_pword(e, callback));
@@ -117,6 +122,7 @@ void vm_add_primary(VM* self, char* token, void (*callback)(VM*)) {
 void vm_add_secondary(VM* self, char* token, List* source) {
   static Element* e;
   if (!e) e = newElement();
+
   e->kind = ELEMENT_WORD_SECONDARY;
   dictionary_add(self->dictionaries[STATE_NORMAL], token,
                  element_set_sword(e, source));
@@ -125,6 +131,7 @@ void vm_add_secondary(VM* self, char* token, List* source) {
 void vm_add_compile(VM* self, char* token, void (*callback)(VM*)) {
   static Element* e;
   if (!e) e = newElement();
+
   e->kind = ELEMENT_WORD_PRIMARY;
   dictionary_add(self->dictionaries[STATE_COMPILE], token,
                  element_set_pword(e, callback));
@@ -133,11 +140,13 @@ void vm_add_compile(VM* self, char* token, void (*callback)(VM*)) {
 void vm_wordbuffer_push(VM* self, char *token){
   static Element* e;
   if (!e) e = newElement();
+
   list_push(self->word_buffer, element_set_cstring(e, token));
 }
 char *vm_wordbuffer_pop(VM *self){
   static Element* e;
   if (!e) e = newElement();
+  
   return element_get_cstring(list_pop(self->word_buffer, e));
 }
 
@@ -148,7 +157,8 @@ void vm_do(VM* self, char* token) {
   if (strcmp("(", token) ==0) self->comment++;
   else if (strcmp(")", token) ==0){
     self->comment--;
-    assert(self->comment >= 0);
+    //assert(self->comment >= 0);
+    error(self->comment >= 0, "unbalanced comments");
   }
   if (self->comment) return;
 
@@ -163,7 +173,8 @@ void vm_do(VM* self, char* token) {
           List* words = element_get_sword(e);
           for (unsigned long i = 0; i < words->top; i++) {
             e = list_get_at(words, words->top - i);
-            assert(e->kind == ELEMENT_CSTRING);
+            //assert(e->kind == ELEMENT_CSTRING);
+            error(e->kind == ELEMENT_CSTRING, "non-cstring in secondary word");
             list_push(self->run_stack, e);
           }
         }
@@ -176,7 +187,8 @@ void vm_do(VM* self, char* token) {
     case STATE_COMPILE:
       if (dictionary_has_key(self->dictionaries[STATE_COMPILE], token)) {
         e = dictionary_get(self->dictionaries[STATE_COMPILE], token);
-        assert(e->kind == ELEMENT_WORD_PRIMARY);
+        //assert(e->kind == ELEMENT_WORD_PRIMARY);
+        error(e->kind == ELEMENT_WORD_PRIMARY, "tried to call non-primary from dictionary");
         element_get_pword(e)(self);
       }else{
         list_push(self->word_buffer, element_set_cstring(e, token));

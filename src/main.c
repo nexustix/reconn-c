@@ -5,10 +5,12 @@
 #include "element.h"
 #include "list.h"
 #include "vm.h"
+#include "util.h"
+
+#include "parse.h"
 
 void _spam(VM* self) { printf("Spam\n"); }
 void _wonderful(VM* self) { printf("Wonderful Spam\n"); }
-
 
 void _def(VM *self){
   vm_state_push(self, STATE_COMPILE);
@@ -40,38 +42,6 @@ int main(int argc, const char* argv[]) {
   Element *e = newElement();
   
   VM *pip = newVM();
-  /*
-
-  List *viking = newList(16);
-  list_push(viking, element_set_cstring(e, "spam"));
-  list_push(viking, element_set_cstring(e, "spam"));
-  list_push(viking, element_set_cstring(e, "spam"));
-  list_push(viking, element_set_cstring(e, "wonderful"));
-  list_push(viking, element_set_cstring(e, "spam"));
-  list_push(viking, element_set_cstring(e, "wonderful"));
-  list_push(viking, element_set_cstring(e, "wonderful"));
-  
-  vm_add_primary(pip, "spam", _spam);
-  vm_add_primary(pip, "wonderful", _wonderful);
-  vm_add_secondary(pip, "viking", viking);
-
-  vm_do(pip, "viking");
-
-  vm_run(pip);
-  */
-
-  //List *list = newList(0);
-
-  //list_push(list, element_set_int(&123));
-
-  /*
-  vm_state_push(pip, 123);
-  StateKind sk = vm_state(pip);
-  printf("%d\n", sk);
-  //sk = vm_state_pop(pip);
-  printf("%d\n", vm_state_pop(pip));
-  printf("%d\n", vm_state(pip));
-  */
 
   vm_add_primary(pip, "spam", _spam);
   vm_add_primary(pip, "wonderful", _wonderful);
@@ -91,11 +61,29 @@ int main(int argc, const char* argv[]) {
   vm_do(pip, "cake");
   vm_run(pip);
 
-
   // printf("Aloha, edit \"src/main.c\" to get started\n");
+
+  //cake("the quick brown \"fox\" woah jumps over the lazy dog", tokens);
+
+  //cake("the quick brown fox jumps over the lazy dog", tokens);
+
+  //cake("the qui\"ck \"br\"own f\"ox ju\"mps ov\"er th\"e l\"azy d\"og", tokens);
+  //cake("the quick brown \"fox\" jumps over the lazy dog", tokens);
+  //cake("words stuff \"the \"\"cake\"\" is a lie\" print me please", tokens);
+  
+
+  List *tokens = newList(16);
+  parse_tokens("words stuff \"the \"\"cake\"\" is a lie\" print me please", tokens);
+
+  for (unsigned long i=1; i<= tokens->top; i++){
+    printf(">%s< ", element_get_cstring(list_get_at(tokens, i)));
+  }
+  printf("\n");
 
   return 0;
 }
 
 // For legacy Microsoft Operating System support
 int WinMain(int argc, const char* argv[]) { return main(argc, argv); }
+
+
