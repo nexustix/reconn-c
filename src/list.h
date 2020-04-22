@@ -85,9 +85,10 @@ unsigned long list_insert(List* self, Element* value) {
   return self->top;
 }
 
-void list_set_id(List* self, unsigned long index, char* id) {
-  free(self->elements[self->top].id);
-  self->elements[self->top].id = (char*)malloc(strlen(id));
+void list_set_id(List* self, unsigned long index, const char* id) {
+  //free(self->elements[self->top].id);
+  //strcpy(self->elements[self->top].id, id);
+  self->elements[self->top].id = (char*)realloc(self->elements[self->top].id, strlen(id));
   strcpy(self->elements[self->top].id, id);
 }
 

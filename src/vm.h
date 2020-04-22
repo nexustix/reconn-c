@@ -3,11 +3,12 @@
 
 //#include <stdlib.h>
 #include <string.h>
+
 #include "dictionary.h"
+#include "ducktype.h"
 #include "element.h"
 #include "list.h"
 #include "util.h"
-
 
 #define TOKEN_DEF "def"
 #define TOKEN_END "end"
@@ -89,28 +90,30 @@ StateKind vm_state(VM* self) {
   // return STATE_NORMAL;
 }
 
-void vm_state_push(VM* self, StateKind state){
+void vm_push_state(VM* self, StateKind state) {
   static Element* e;
   if (!e) e = newElement();
 
-  StateKind *tmp = malloc(sizeof(StateKind));
+  StateKind* tmp = malloc(sizeof(StateKind));
   *tmp = state;
   list_push(self->state_stack, element_set_int(e, (int*)tmp));
 }
 
-StateKind vm_state_pop(VM* self){
+StateKind vm_pop_state(VM* self) {
   static Element* e;
   if (!e) e = newElement();
 
-  //assert(!list_is_empty(self->state_stack));
-  error(!list_is_empty(self->state_stack), "tried popping from empty state stack");
-  StateKind *state = (StateKind*)element_get_int(list_pop(self->state_stack, e));
+  // assert(!list_is_empty(self->state_stack));
+  error(!list_is_empty(self->state_stack),
+        "tried popping from empty state stack");
+  StateKind* state =
+      (StateKind*)element_get_int(list_pop(self->state_stack, e));
   return *state;
   free(state);
-  //return (StateKind)*element_get_int(list_pop(self->state_stack, e));
+  // return (StateKind)*element_get_int(list_pop(self->state_stack, e));
 }
 
-void vm_add_primary(VM* self, char* token, void (*callback)(VM*)) {
+void vm_add_primary(VM* self, const char* token, void (*callback)(VM*)) {
   static Element* e;
   if (!e) e = newElement();
 
@@ -119,7 +122,7 @@ void vm_add_primary(VM* self, char* token, void (*callback)(VM*)) {
                  element_set_pword(e, callback));
 }
 
-void vm_add_secondary(VM* self, char* token, List* source) {
+void vm_add_secondary(VM* self, const char* token, List* source) {
   static Element* e;
   if (!e) e = newElement();
 
@@ -128,7 +131,7 @@ void vm_add_secondary(VM* self, char* token, List* source) {
                  element_set_sword(e, source));
 }
 
-void vm_add_compile(VM* self, char* token, void (*callback)(VM*)) {
+void vm_add_compile(VM* self, const char* token, void (*callback)(VM*)) {
   static Element* e;
   if (!e) e = newElement();
 
@@ -137,67 +140,112 @@ void vm_add_compile(VM* self, char* token, void (*callback)(VM*)) {
                  element_set_pword(e, callback));
 }
 
-void vm_wordbuffer_push(VM* self, char *token){
+void vm_push_wordbuffer(VM* self, const char* token) {
   static Element* e;
   if (!e) e = newElement();
 
   list_push(self->word_buffer, element_set_cstring(e, token));
 }
-char *vm_wordbuffer_pop(VM *self){
+const char* vm_pop_wordbuffer(VM* self) {
   static Element* e;
   if (!e) e = newElement();
-  
+
   return element_get_cstring(list_pop(self->word_buffer, e));
 }
 
-void vm_do(VM* self, char* token) {
-  static Element* e;
-  if (!e) e = newElement();
+void vm_push_value(VM* self, Element* value) {
+  list_push(self->value_stack, value);
+}
+Element* vm_pop_value(VM* self, Element* value) {
+  return list_pop(self->value_stack, value);
+}
 
-  if (strcmp("(", token) ==0) self->comment++;
-  else if (strcmp(")", token) ==0){
+int vm_do(VM* self, const char* token) {
+  // static Element* e;
+  // if (!e) e = newElement();
+
+  // FIXME comb for memory leaks
+  Element* e = newElement();
+
+  // fprintf(stderr, " - do >%s< inside >%d<\n", token, (int)vm_state(self));
+  // fprintf(stderr, " - do >%s<\n", token);
+
+  if (strcmp("(", token) == 0)
+    self->comment++;
+  else if (strcmp(")", token) == 0) {
     self->comment--;
-    //assert(self->comment >= 0);
+    // assert(self->comment >= 0);
     error(self->comment >= 0, "unbalanced comments");
   }
-  if (self->comment) return;
+  if (self->comment) return 0;
 
   int state = vm_state(self);
   switch (state) {
     case STATE_NORMAL:
+      // fprintf(stderr, " - inside NORMAL\n");
       if (dictionary_has_key(self->dictionaries[STATE_NORMAL], token)) {
         e = dictionary_get(self->dictionaries[STATE_NORMAL], token);
         if (e->kind == ELEMENT_WORD_PRIMARY) {
+          // fprintf(stderr, " - found prime\n");
           element_get_pword(e)(self);
         } else if (e->kind == ELEMENT_WORD_SECONDARY) {
+          // fprintf(stderr, " - found secondary\n");
           List* words = element_get_sword(e);
           for (unsigned long i = 0; i < words->top; i++) {
             e = list_get_at(words, words->top - i);
-            //assert(e->kind == ELEMENT_CSTRING);
+            // assert(e->kind == ELEMENT_CSTRING);
             error(e->kind == ELEMENT_CSTRING, "non-cstring in secondary word");
             list_push(self->run_stack, e);
           }
+        } else {
+          error(0, "non-word in dictionary");
         }
       } else {
-        fprintf( stderr, " ! no idea what >%s< means\n", token);
+        Element* element = ducktype_as_whatever(token, 1);
+        if (element) {
+          switch (element->kind) {
+            case ELEMENT_CSTRING:
+              element_set_bignum(element, bignum_copy_cstring(element_get_cstring(element)));
+              vm_push_value(self, element);
+              return 0;
+              break;
+
+            case ELEMENT_BIGNUM:
+              vm_push_value(self, element);
+              //error(0, "looks like a number");
+              return 0;
+              break;
+
+            default:
+              error(0, "value resolved to invalid type");
+              break;
+          }
+        } else {
+          fprintf(stderr, " ! no idea what >%s< means\n", token);
+        }
+        return 1;
       }
       break;
 
     case STATE_COMPILE:
+      // fprintf(stderr, " - inside COMPILE\n");
       if (dictionary_has_key(self->dictionaries[STATE_COMPILE], token)) {
         e = dictionary_get(self->dictionaries[STATE_COMPILE], token);
-        //assert(e->kind == ELEMENT_WORD_PRIMARY);
-        error(e->kind == ELEMENT_WORD_PRIMARY, "tried to call non-primary from dictionary");
+        // assert(e->kind == ELEMENT_WORD_PRIMARY);
+        error(e->kind == ELEMENT_WORD_PRIMARY,
+              "tried to call non-primary from dictionary");
         element_get_pword(e)(self);
-      }else{
+      } else {
         list_push(self->word_buffer, element_set_cstring(e, token));
       }
       break;
 
     case STATE_HARD:
-      if (strcmp(TOKEN_END, token)){
-        vm_state_pop(self);
-      }else{
+      // fprintf(stderr, " - inside HARD COMPILE\n");
+      if (strcmp(TOKEN_END, token) == 0) {
+        vm_push_wordbuffer(self, TOKEN_END);
+        vm_pop_state(self);
+      } else {
         list_push(self->word_buffer, element_set_cstring(e, token));
       }
       break;
@@ -205,32 +253,48 @@ void vm_do(VM* self, char* token) {
     default:
       break;
   }
+  return 0;
 }
 
-void vm_run(VM* self) {
+int vm_run(VM* self) {
   static Element* e;
   if (!e) e = newElement();
-  while(! list_is_empty(self->run_stack)){
+  while (!list_is_empty(self->run_stack)) {
     list_pop(self->run_stack, e);
-    if (e->kind == ELEMENT_CSTRING){
-      vm_do(self, element_get_cstring(e));
+    if (e->kind == ELEMENT_CSTRING) {
+      if (vm_do(self, element_get_cstring(e))) return 1;
+      ;
     }
   }
+  return 0;
 }
 
-void vm_execute(VM *self, char* word){
-  vm_do(self, word);
-  vm_run(self);
+int vm_execute(VM* self, const char* word) {
+  int r;
+  r = vm_do(self, word);
+  // FIXME refine, doesn't care abour half compiled words
+  if (r) {
+    self->run_stack->top = 0;
+    return r;
+  }
+  r = vm_run(self);
+  if (r) {
+    self->run_stack->top = 0;
+    return r;
+  }
+  return 0;
 }
 
-void vm_execute_all(VM *self, List* words, int ok){
-  for (unsigned long i=1; i<= words->top; i++){
-    //printf(">%s< ", element_get_cstring(list_get_at(tokens, i)));
-    vm_execute(self, element_get_cstring(list_get_at(words, i)));
+int vm_execute_all(VM* self, List* words, int ok) {
+  for (unsigned long i = 1; i <= words->top; i++) {
+    // printf(">%s< ", element_get_cstring(list_get_at(tokens, i)));
+    if (vm_execute(self, element_get_cstring(list_get_at(words, i)))) {
+      if (ok) fprintf(stderr, " ! ERR\n");
+      return 1;
+    }
   }
-  if (ok){
-    printf(" OK");
-  }
+  if (ok) fprintf(stderr, " - OK\n");
+  return 0;
 }
 
 #endif

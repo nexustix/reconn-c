@@ -44,7 +44,6 @@ unsigned int parse_string(char *data, unsigned int offset, List *tokens) {
       buffer[counter] = cur;
       counter++;
     }
-
   }
   //TODO evaulate
   return 0;
@@ -67,29 +66,35 @@ void parse_tokens(char *data, List *tokens) {
       if (inside_token) {
         size++;
         // flush token
-        buffer = (char *)malloc(size);
+        buffer = (char *)calloc(size+1, 1);
         strncpy(buffer, data + offset, size);
         list_push(tokens, element_set_cstring(e, buffer));
         offset = i;
+      }else{
+        offset++;
       }
       inside_token = 0;
     } else {
       if (inside_token) {
         size++;
       } else if (cur == QUOTE_CHAR) {
-        offset++;
+        //offset++;
         //printf(">??<\n");
         size = parse_string(data, i, tokens);
         //printf(">??<\n");
 
-        i += size+1;
-        offset += size+1;
+        i += size;
+        offset += size;
+        //offset = i;
         size = 0;
+        inside_token = 0;
         //error(0, "can't deal with strings yet");
+        continue;
       } else {
         size = 0;
         offset = i;
       }
+      //printf("(%c)",cur);
       inside_token = 1;
     }
   }

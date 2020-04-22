@@ -1,7 +1,7 @@
 #ifndef HASH_H
 #define HASH_H
 
-unsigned long hash_cstring_djb2(unsigned char* str) {
+unsigned long hash_cstring_djb2(const unsigned char* str) {
   unsigned long hash = 5381;
   int c;
 
@@ -10,7 +10,7 @@ unsigned long hash_cstring_djb2(unsigned char* str) {
   return hash;
 }
 
-unsigned long hash_cstring_sdbm(unsigned char* string) {
+unsigned long hash_cstring_sdbm(const unsigned char* string) {
   unsigned long hash = 0;
   int c;
 
@@ -19,7 +19,7 @@ unsigned long hash_cstring_sdbm(unsigned char* string) {
   return hash;
 }
 
-unsigned long hash_cstring(char* string, unsigned long bucket_count) {
+unsigned long hash_cstring(const char* string, unsigned long bucket_count) {
   switch (bucket_count) {
     case 0xf:
     case 0xff:

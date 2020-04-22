@@ -11,13 +11,13 @@
 //#include "vm.h"
 
 typedef enum {
-  ELEMENT_VOID,   // uninitialized
-  ELEMENT_EMPTY,  // ready for contents
-  ELEMENT_BIGNUM,
-  ELEMENT_WORD_PRIMARY,
-  ELEMENT_WORD_SECONDARY,
-  ELEMENT_INT,
-  ELEMENT_CSTRING,
+  /*0*/ ELEMENT_VOID,   // uninitialized
+  /*1*/ ELEMENT_EMPTY,  // ready for contents
+  /*2*/ ELEMENT_BIGNUM,
+  /*3*/ ELEMENT_WORD_PRIMARY,
+  /*4*/ ELEMENT_WORD_SECONDARY,
+  /*5*/ ELEMENT_INT,
+  /*6*/ ELEMENT_CSTRING,
 } ElementKind;
 
 typedef struct Element {
@@ -54,9 +54,9 @@ Element* element_set_int(Element* destination, int* source) {
   return destination;
 }
 
-char* element_get_cstring(Element* self) { return (char*)self->data; }
+const char* element_get_cstring(Element* self) { return (const char*)self->data; }
 
-Element* element_set_cstring(Element* destination, char* source) {
+Element* element_set_cstring(Element* destination, const char* source) {
   destination->data = (void*)source;
   destination->kind = ELEMENT_CSTRING;
   return destination;

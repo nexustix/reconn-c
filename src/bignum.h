@@ -25,6 +25,23 @@ Bignum* newBignum(unsigned int base) {
   return self;
 }
 
+void bignum_resize(Bignum* self, unsigned int size) {
+  self->digits = (unsigned char*)realloc(self->digits, size);
+}
+
+Bignum *bignum_copy_cstring(const char *cstring){
+  size_t length = strlen(cstring);
+  Bignum* self = newBignum(256);
+  bignum_resize(self, length);
+  //self->digits = (unsigned char*)cstring;
+  self->digits = (unsigned char*)strcpy((char*)self->digits, cstring);
+  self->negative = 0;
+  self->last = length-1;
+  //self->base = 256;
+  return self;
+}
+
+/*
 void oldBignum(Bignum* self, unsigned int base) {
   const unsigned int maxlen = 16;
   if (self->reserve > maxlen) {
@@ -39,6 +56,7 @@ void oldBignum(Bignum* self, unsigned int base) {
   self->last = 0;
   self->base = base;
 }
+*/
 
 void dupBignum(Bignum* destination, Bignum* source) {
   // bignum_resize(destination, source->last+1);
@@ -49,10 +67,6 @@ void dupBignum(Bignum* destination, Bignum* source) {
   destination->last = source->last;
   destination->base = source->base;
   destination->reserve = source->last + 1;
-}
-
-void bignum_resize(Bignum* self, unsigned int size) {
-  self->digits = (unsigned char*)realloc(self->digits, size);
 }
 
 Bignum* bignum_from_chars(unsigned int base, unsigned int size,
@@ -87,7 +101,7 @@ void bignum_set_digit(Bignum* self, unsigned int index, unsigned char digit) {
   }
 }
 
-char* bignum_to_cstring(Bignum* self) {
+const char* bignum_to_cstring(Bignum* self) {
   char* s;
   unsigned int pointer = 1;
   char* tmp = (char*)malloc(1);
@@ -103,7 +117,9 @@ char* bignum_to_cstring(Bignum* self) {
     s[0] = '+';
   }
 
-  if (self->base > 10) {
+  if (self->base == 256){
+    return (const char*)self->digits;
+  } else if (self->base > 10) {
     for (unsigned int i = 0; i <= self->last; i++) {
       sprintf(tmp, "%d", self->digits[self->last - i]);
       s[pointer] = tmp[0];
