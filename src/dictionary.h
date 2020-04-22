@@ -49,24 +49,6 @@ void dictionary_forget_all(Dictionary* self, char* key) {
     ;
 }
 
-/*
-void dictionary_add(Dictionary *self, char *key, void *value){
-    unsigned long bucket_index = hash_string(key) % self->bucket_count;
-    //list_push(&self->buckets[bucket_index]);
-
-}
-*/
-/*
-void dictionary_add_bignum(Dictionary *self, char *key, Bignum* value){
-    unsigned long hash = hash_cstring(key, self->bucket_count);
-    list_push_bignum(&self->buckets[hash], value);
-    list_set_id(&self->buckets[hash], self->buckets[hash].top, key);
-    //strcpy()
-    //self->buckets[hash]->elements[self->buckets[hash].top].id = key;
-    //strcpy(self->buckets[hash].elements[self->buckets[hash].top].id, key);
-}
-*/
-
 void dictionary_add(Dictionary* self, char* key, Element* value) {
   unsigned long hash = hash_cstring(key, self->bucket_count);
   unsigned long index = list_insert(&self->buckets[hash], value);

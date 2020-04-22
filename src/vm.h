@@ -179,8 +179,7 @@ void vm_do(VM* self, char* token) {
           }
         }
       } else {
-        printf("no idea what >%s< means\n", token);
-        //TODO turn words into values
+        fprintf( stderr, " ! no idea what >%s< means\n", token);
       }
       break;
 
@@ -207,6 +206,7 @@ void vm_do(VM* self, char* token) {
       break;
   }
 }
+
 void vm_run(VM* self) {
   static Element* e;
   if (!e) e = newElement();
@@ -215,6 +215,21 @@ void vm_run(VM* self) {
     if (e->kind == ELEMENT_CSTRING){
       vm_do(self, element_get_cstring(e));
     }
+  }
+}
+
+void vm_execute(VM *self, char* word){
+  vm_do(self, word);
+  vm_run(self);
+}
+
+void vm_execute_all(VM *self, List* words, int ok){
+  for (unsigned long i=1; i<= words->top; i++){
+    //printf(">%s< ", element_get_cstring(list_get_at(tokens, i)));
+    vm_execute(self, element_get_cstring(list_get_at(words, i)));
+  }
+  if (ok){
+    printf(" OK");
   }
 }
 

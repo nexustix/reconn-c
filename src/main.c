@@ -39,7 +39,7 @@ void _end_compile(VM *self){
 void _do(VM *self){}
 
 int main(int argc, const char* argv[]) {
-  Element *e = newElement();
+  //Element *e = newElement();
   
   VM *pip = newVM();
 
@@ -50,35 +50,19 @@ int main(int argc, const char* argv[]) {
   vm_add_compile(pip, "def", _def_compile);
   vm_add_compile(pip, "end", _end_compile);
 
-  List *viking = newList(16);
-  vm_do(pip, "def");
-  vm_do(pip, "cake");
-  vm_do(pip, "spam");
-  vm_do(pip, "wonderful");
-  vm_do(pip, "spam");
-  vm_do(pip, "end");
-
-  vm_do(pip, "cake");
-  vm_run(pip);
-
-  // printf("Aloha, edit \"src/main.c\" to get started\n");
-
-  //cake("the quick brown \"fox\" woah jumps over the lazy dog", tokens);
-
-  //cake("the quick brown fox jumps over the lazy dog", tokens);
-
-  //cake("the qui\"ck \"br\"own f\"ox ju\"mps ov\"er th\"e l\"azy d\"og", tokens);
-  //cake("the quick brown \"fox\" jumps over the lazy dog", tokens);
-  //cake("words stuff \"the \"\"cake\"\" is a lie\" print me please", tokens);
-  
-
   List *tokens = newList(16);
-  parse_tokens("words stuff \"the \"\"cake\"\" is a lie\" print me please", tokens);
 
-  for (unsigned long i=1; i<= tokens->top; i++){
-    printf(">%s< ", element_get_cstring(list_get_at(tokens, i)));
+  size_t size;
+  char *data = NULL;
+
+  while (1){
+    //printf("\n>");
+    getline(&data, &size, stdin);
+    parse_tokens(data, tokens);
+
+    vm_execute_all(pip, tokens, 0);
+    tokens->top = 0;
   }
-  printf("\n");
 
   return 0;
 }

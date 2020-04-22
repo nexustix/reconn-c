@@ -30,50 +30,7 @@ void list_resize(List* self, unsigned long size) {
 }
 
 int list_is_empty(List* self) { return !self->top; }
-/*
-void list_push_bignum(List *self, Bignum* value){
-    if (self->top+2 > self->reserve) {
-        list_resize(self, self->top+2);
-    }
-    self->top++;
-    element_from_bignum(&self->elements[self->top], value);
-}
 
-void list_pop_bignum(List *self, Bignum *result){
-    if (self->top){
-        element_as_bignum(&self->elements[self->top], result);
-        self->top--;
-    }else{
-        free(result);
-        result = NULL;
-    }
-}
-*/
-
-/*
-void list_push(List *self, ElementKind kind,  void *value){
-    if (self->top+2 > self->reserve) {
-        list_resize(self, self->top+2);
-    }
-    self->top++;
-    self->elements[self->top].data = value;
-    self->elements[self->top].kind = kind;
-}
-
-ElementKind list_pop(List *self, void *value){
-    if (self->top){
-        //element_as_bignum(&self->elements[self->top], result);
-        value = self->elements[self->top].data;
-        //kind = self->elements[self->top].kind;
-        self->top--;
-        return self->elements[self->top].kind;
-    }else{
-        value = NULL;
-        //kind = ELEMENT_EMPTY;
-        return ELEMENT_EMPTY;
-    }
-}
-*/
 
 void list_set_at(List* self, unsigned long index, Element* value) {
   assert(index <= self->top);

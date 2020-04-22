@@ -95,34 +95,4 @@ void parse_tokens(char *data, List *tokens) {
   }
 }
 
-/*
-void tokenize_oneshot(List *segs, char* data) {
-  static Element *e;
-  if (!e) e = newElement();
-
-  char* buffer;
-  char cur;
-  unsigned int offset = 0;
-  unsigned int size = 0;
-  unsigned int length = strlen(data);
-  int in_string = 0;
-
-  for (unsigned int i = 0; i <= length; i++) {
-    cur = data[i];
-    if (isspace(cur) && !in_string) {
-      if (size) {
-        buffer = (char*)malloc(size);
-        strncpy(buffer, data+offset, size);
-        list_push(segs, element_set_cstring(e, buffer));
-        offset += size;
-        size = 0;
-      } else
-        continue;
-    } else {
-      size++;
-    }
-  }
-}
-*/
-
 #endif
