@@ -43,9 +43,6 @@ void _println(VM *self) {
   if (!e) e = newElement();
   vm_pop_value(self, e);
   assert(e->kind == ELEMENT_BIGNUM);
-  // if (e)
-  // printf(">%s<\n", element_get_bignum(e)->digits);
-  // printf("%s\n", bn->digits);
   printf("%s\n", bignum_to_cstring(element_get_bignum(e)));
   free(e);
 }
@@ -53,13 +50,24 @@ void _println(VM *self) {
 void _print_value_stack(VM *self) {
   printf(" | ");
   for (unsigned long i = 1; i <= self->value_stack->top; i++) {
-    // printf("[%s] ", element_get_bignum(list_get_at(self->value_stack,
-    // i))->digits);
     printf("[%s] ", bignum_to_cstring(
                         element_get_bignum(list_get_at(self->value_stack, i))));
   }
   printf("|>\n");
 }
+
+void _print_namespace(VM *self) { printf(">%s<\n", vm_namespace(self)); }
+
+void _enter(VM *self) {
+  static Element *e;
+  if (!e) e = newElement();
+  vm_pop_value(self, e);
+  assert(e->kind == ELEMENT_BIGNUM);
+  printf("entering >%s<\n", bignum_to_cstring(element_get_bignum(e)));
+  vm_push_namespace(self, bignum_to_cstring(element_get_bignum(e)));
+}
+
+void _leave(VM *self) { vm_pop_namespace(self); }
 
 int main(int argc, const char *argv[]) {
   VM *pip = newVM();
@@ -71,13 +79,18 @@ int main(int argc, const char *argv[]) {
   vm_add_primary(pip, "println", _println);
   vm_add_primary(pip, "s", _print_value_stack);
 
-  vm_add_primary(pip, "spam", _spam);
-  vm_add_primary(pip, "wonderful", _wonderful);
-
   vm_add_primary(pip, "add", voc_mat_ari_add);
   vm_add_primary(pip, "sub", voc_mat_ari_sub);
   vm_add_primary(pip, "+", voc_mat_ari_add);
   vm_add_primary(pip, "-", voc_mat_ari_sub);
+
+  vm_add_primary(pip, "namespace", _print_namespace);
+  vm_add_primary(pip, "#enter", _enter);
+  vm_add_primary(pip, "#leave", _leave);
+
+  vm_add_primary(pip, "spam", _spam);
+  vm_add_primary(pip, "cake.spam", _spam);
+  vm_add_primary(pip, "wonderful", _wonderful);
 
   List *tokens = newList(16);
 
@@ -99,13 +112,12 @@ int main(int argc, const char *argv[]) {
   }
 
   /*
-  char *snumber = "-3587";
-  Element *e = ducktype_as_bignum(snumber, 10);
-  Bignum *bn = newBignum(10);
-  if (e){
-    printf("YES >%d<\n", e->kind);
-    bn = element_get_bignum(e);
-    printf("%s\n",bignum_to_cstring(bn));
+  vm_push_namespace(pip, "cake.toast");
+  Element *e = vm_find_word(pip, "bake");
+  if (e) {
+    printf("something >%s<\n", e->id);
+  } else {
+    printf("nothing\n");
   }
   */
 

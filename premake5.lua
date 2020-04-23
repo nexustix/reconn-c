@@ -28,6 +28,7 @@ project "cstarter"
         symbols "On"
         --warnings "Extra"
         enablewarnings { "all" }
+        disablewarnings { "parentheses" }
 
     filter "configurations:Release"
         defines { "NDEBUG" }

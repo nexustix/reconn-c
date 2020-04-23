@@ -160,6 +160,63 @@ Element* vm_pop_value(VM* self, Element* value) {
   return list_pop(self->value_stack, value);
 }
 
+char* vm_namespace(VM* self) {
+  // // FIXME will fail with huge namespaces
+  // char* namespace = calloc(2048, 1);
+  char* namespace = calloc(1024, 1);
+  // char* namespace = "";
+  if (self->namespace_stack->top > 0) {
+    for (unsigned int i = 1; i <= self->namespace_stack->top; i++) {
+      if (!i) strcat(namespace, ".");
+      strcat(namespace,
+             element_get_cstring(list_get_at(self->namespace_stack, i)));
+      if (i < self->namespace_stack->top) strcat(namespace, ".");
+    }
+  }
+  return namespace;
+}
+
+void vm_push_namespace(VM* self, const char* name) {
+  static Element* e;
+  if (!e) e = newElement();
+
+  list_push(self->namespace_stack, element_set_cstring(e, name));
+}
+
+const char* vm_pop_namespace(VM* self) {
+  static Element* e;
+  if (!e) e = newElement();
+  error(self->namespace_stack->top,
+        "Can't leave namespace while not inside "
+        "namespace");
+  return element_get_cstring(list_pop(self->namespace_stack, e));
+}
+
+Element* vm_find_word(VM* self, const char* token) {
+  char* namespace = vm_namespace(self);
+  size_t namespace_length = strlen(namespace);
+  size_t token_length = strlen(token);
+  char* wordname = calloc(namespace_length + token_length + 1, 1);
+  Element* result;
+
+  // HACK
+  while (1) {
+    wordname[0] = 0;
+    if (namespace[0]) {
+      strcat(wordname, namespace);
+      strcat(wordname, ".");
+      strcat(wordname, token);
+    } else {
+      strcat(wordname, token);
+    }
+    result = dictionary_get(self->dictionaries[vm_state(self)], wordname);
+    if (result) return result;
+    if (!namespace[0]) break;
+    seplob(namespace, '.');
+  }
+  return NULL;
+}
+
 int vm_do(VM* self, const char* token) {
   // static Element* e;
   // if (!e) e = newElement();

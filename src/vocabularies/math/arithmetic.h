@@ -25,6 +25,7 @@ void voc_mat_ari_add(VM *vm) {
   free(a);
   free(b);
 }
+
 void voc_mat_ari_sub(VM *vm) {
   Element *eb = vm_pop_value(vm, newElement());
   Element *ea = vm_pop_value(vm, newElement());

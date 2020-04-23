@@ -82,13 +82,18 @@ Bignum* bignum_from_chars(unsigned int base, unsigned int size,
 }
 
 void bignum_clean_zeroes(Bignum* self) {
+  unsigned int new_last = self->last;
   for (unsigned int i = 0; i <= self->last; i++) {
     if (self->digits[self->last - i] == 0) {
-      self->last--;
+      // self->last--;
+      // new_last--;
+      new_last = self->last - i;
     } else {
-      return;
+      // return;
+      break;
     }
   }
+  self->last = new_last;
 }
 
 void bignum_set_digit(Bignum* self, unsigned int index, unsigned char digit) {
