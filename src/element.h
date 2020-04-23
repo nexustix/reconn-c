@@ -32,9 +32,7 @@ Element* newElement() {
   Element* self = (Element*)calloc(1, sizeof(*self));
   self->data = NULL;
   self->id = NULL;
-  // recycleBignum(&self->data);
   self->kind = ELEMENT_EMPTY;
-  // self->size = 0;
   return self;
 }
 
@@ -54,7 +52,9 @@ Element* element_set_int(Element* destination, int* source) {
   return destination;
 }
 
-const char* element_get_cstring(Element* self) { return (const char*)self->data; }
+const char* element_get_cstring(Element* self) {
+  return (const char*)self->data;
+}
 
 Element* element_set_cstring(Element* destination, const char* source) {
   destination->data = (void*)source;

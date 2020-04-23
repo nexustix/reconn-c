@@ -6,7 +6,7 @@
 
 #include "element.h"
 
-typedef struct List{
+typedef struct List {
   Element* elements;
   unsigned long top;
   unsigned long reserve;
@@ -16,10 +16,7 @@ List* newList(unsigned long initial_size) {
   List* self = (List*)calloc(1, sizeof(*self));
   self->reserve = initial_size;
   self->top = 0;
-  // self->elements = (Element*)calloc(self->reserve,
-  // self->size*sizeof(Element));
   self->elements = (Element*)calloc(self->reserve, sizeof(Element));
-  // self->elements[0].kind = ELEMENT_NOTHING;
   self->elements[0].kind = ELEMENT_VOID;
   return self;
 }
@@ -30,7 +27,6 @@ void list_resize(List* self, unsigned long size) {
 }
 
 int list_is_empty(List* self) { return !self->top; }
-
 
 void list_set_at(List* self, unsigned long index, Element* value) {
   assert(index <= self->top);
@@ -45,7 +41,6 @@ Element* list_get_at(List* self, unsigned long index) {
 }
 
 void list_remove_at(List* self, unsigned long index) {
-  // assert(index <= self->top);
   assert(index < self->reserve);
   self->elements[index].kind = ELEMENT_EMPTY;
 }
@@ -86,9 +81,8 @@ unsigned long list_insert(List* self, Element* value) {
 }
 
 void list_set_id(List* self, unsigned long index, const char* id) {
-  //free(self->elements[self->top].id);
-  //strcpy(self->elements[self->top].id, id);
-  self->elements[self->top].id = (char*)realloc(self->elements[self->top].id, strlen(id));
+  self->elements[self->top].id =
+      (char*)realloc(self->elements[self->top].id, strlen(id));
   strcpy(self->elements[self->top].id, id);
 }
 

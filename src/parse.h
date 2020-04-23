@@ -12,31 +12,25 @@
 #include "list.h"
 #include "util.h"
 
-
-
 unsigned int parse_string(char *data, unsigned int offset, List *tokens) {
   static Element *e;
   if (!e) e = newElement();
-  //const static quote = '"';
-  //int inside_token = 0;
   int quote_found = 0;
-  //unsigned int size = 1;
   unsigned int counter = 1;
   unsigned int max_length = strlen(data) - offset;
   unsigned char cur;
-  char *buffer = (char*)calloc(max_length, 1);
+  char *buffer = (char *)calloc(max_length, 1);
   buffer[0] = QUOTE_CHAR;
   for (unsigned int i = 1; i < max_length; i++) {
     cur = data[offset + i];
-    //printf("(%s)", &cur);
-    if (cur == QUOTE_CHAR){
-      if (quote_found){
+    if (cur == QUOTE_CHAR) {
+      if (quote_found) {
         buffer[counter] = QUOTE_CHAR;
         counter++;
       }
       quote_found = !quote_found;
-    }else{
-      if (quote_found){
+    } else {
+      if (quote_found) {
         buffer[counter] = QUOTE_CHAR;
         list_push(tokens, element_set_cstring(e, buffer));
         return i;
@@ -45,7 +39,7 @@ unsigned int parse_string(char *data, unsigned int offset, List *tokens) {
       counter++;
     }
   }
-  //TODO evaulate
+  // TODO evaulate
   return 0;
 }
 
@@ -66,11 +60,11 @@ void parse_tokens(char *data, List *tokens) {
       if (inside_token) {
         size++;
         // flush token
-        buffer = (char *)calloc(size+1, 1);
+        buffer = (char *)calloc(size + 1, 1);
         strncpy(buffer, data + offset, size);
         list_push(tokens, element_set_cstring(e, buffer));
         offset = i;
-      }else{
+      } else {
         offset++;
       }
       inside_token = 0;
@@ -78,23 +72,18 @@ void parse_tokens(char *data, List *tokens) {
       if (inside_token) {
         size++;
       } else if (cur == QUOTE_CHAR) {
-        //offset++;
-        //printf(">??<\n");
         size = parse_string(data, i, tokens);
-        //printf(">??<\n");
 
         i += size;
         offset += size;
-        //offset = i;
         size = 0;
         inside_token = 0;
-        //error(0, "can't deal with strings yet");
         continue;
       } else {
         size = 0;
         offset = i;
       }
-      //printf("(%c)",cur);
+
       inside_token = 1;
     }
   }

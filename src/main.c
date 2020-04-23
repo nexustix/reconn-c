@@ -7,7 +7,6 @@
 #include "parse.h"
 #include "util.h"
 #include "vm.h"
-
 #include "vocabularies/math/arithmetic.h"
 
 void _spam(VM *self) { printf("Spam\n"); }
@@ -44,24 +43,25 @@ void _println(VM *self) {
   if (!e) e = newElement();
   vm_pop_value(self, e);
   assert(e->kind == ELEMENT_BIGNUM);
-  //if (e)
-  //printf(">%s<\n", element_get_bignum(e)->digits);
-  //printf("%s\n", bn->digits);
+  // if (e)
+  // printf(">%s<\n", element_get_bignum(e)->digits);
+  // printf("%s\n", bn->digits);
   printf("%s\n", bignum_to_cstring(element_get_bignum(e)));
   free(e);
 }
 
 void _print_value_stack(VM *self) {
   printf(" | ");
-  for (unsigned long i=1;i <= self->value_stack->top;i++){
-    //printf("[%s] ", element_get_bignum(list_get_at(self->value_stack, i))->digits);
-    printf("[%s] ", bignum_to_cstring(element_get_bignum(list_get_at(self->value_stack, i))));
+  for (unsigned long i = 1; i <= self->value_stack->top; i++) {
+    // printf("[%s] ", element_get_bignum(list_get_at(self->value_stack,
+    // i))->digits);
+    printf("[%s] ", bignum_to_cstring(
+                        element_get_bignum(list_get_at(self->value_stack, i))));
   }
   printf("|>\n");
 }
 
 int main(int argc, const char *argv[]) {
-  
   VM *pip = newVM();
 
   vm_add_primary(pip, "def", _def);
@@ -90,14 +90,13 @@ int main(int argc, const char *argv[]) {
     // printf("\n>");
     getline(&data, &size, stdin);
     parse_tokens(data, tokens);
-    //for (unsigned long i=1; i<= tokens->top; i++){
+    // for (unsigned long i=1; i<= tokens->top; i++){
     // printf(" >%s< ", element_get_cstring(list_get_at(tokens, i)));
     //}
-    //printf("\n");
+    // printf("\n");
     vm_execute_all(pip, tokens, 1);
     tokens->top = 0;
   }
-  
 
   /*
   char *snumber = "-3587";
@@ -109,7 +108,6 @@ int main(int argc, const char *argv[]) {
     printf("%s\n",bignum_to_cstring(bn));
   }
   */
-  
 
   return 0;
 }

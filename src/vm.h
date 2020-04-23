@@ -164,11 +164,10 @@ int vm_do(VM* self, const char* token) {
   // static Element* e;
   // if (!e) e = newElement();
 
-  // FIXME comb for memory leaks
+  // FIXME - comb for memory leaks
   Element* e = newElement();
 
   // fprintf(stderr, " - do >%s< inside >%d<\n", token, (int)vm_state(self));
-  // fprintf(stderr, " - do >%s<\n", token);
 
   if (strcmp("(", token) == 0)
     self->comment++;
@@ -205,14 +204,14 @@ int vm_do(VM* self, const char* token) {
         if (element) {
           switch (element->kind) {
             case ELEMENT_CSTRING:
-              element_set_bignum(element, bignum_copy_cstring(element_get_cstring(element)));
+              element_set_bignum(
+                  element, bignum_copy_cstring(element_get_cstring(element)));
               vm_push_value(self, element);
               return 0;
               break;
 
             case ELEMENT_BIGNUM:
               vm_push_value(self, element);
-              //error(0, "looks like a number");
               return 0;
               break;
 
@@ -287,7 +286,6 @@ int vm_execute(VM* self, const char* word) {
 
 int vm_execute_all(VM* self, List* words, int ok) {
   for (unsigned long i = 1; i <= words->top; i++) {
-    // printf(">%s< ", element_get_cstring(list_get_at(tokens, i)));
     if (vm_execute(self, element_get_cstring(list_get_at(words, i)))) {
       if (ok) fprintf(stderr, " ! ERR\n");
       return 1;

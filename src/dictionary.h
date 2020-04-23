@@ -50,7 +50,6 @@ void dictionary_forget_all(Dictionary* self, const char* key) {
 }
 
 void dictionary_add(Dictionary* self, const char* key, Element* value) {
-  //printf("adding key >%s<\n", key);
   unsigned long hash = hash_cstring(key, self->bucket_count);
   unsigned long index = list_insert(&self->buckets[hash], value);
   list_set_id(&self->buckets[hash], index, key);
@@ -64,7 +63,5 @@ Element* dictionary_get(Dictionary* self, const char* key) {
   }
   return NULL;
 }
-
-// void di
 
 #endif

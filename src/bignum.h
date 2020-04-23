@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Bignum{
+typedef struct Bignum {
   unsigned char* digits;
   int negative;          // is number negative (boolean)
   unsigned int last;     // index of last element
@@ -29,15 +29,15 @@ void bignum_resize(Bignum* self, unsigned int size) {
   self->digits = (unsigned char*)realloc(self->digits, size);
 }
 
-Bignum *bignum_copy_cstring(const char *cstring){
+Bignum* bignum_copy_cstring(const char* cstring) {
   size_t length = strlen(cstring);
   Bignum* self = newBignum(256);
   bignum_resize(self, length);
-  //self->digits = (unsigned char*)cstring;
+  // self->digits = (unsigned char*)cstring;
   self->digits = (unsigned char*)strcpy((char*)self->digits, cstring);
   self->negative = 0;
-  self->last = length-1;
-  //self->base = 256;
+  self->last = length - 1;
+  // self->base = 256;
   return self;
 }
 
@@ -117,7 +117,7 @@ const char* bignum_to_cstring(Bignum* self) {
     s[0] = '+';
   }
 
-  if (self->base == 256){
+  if (self->base == 256) {
     return (const char*)self->digits;
   } else if (self->base > 10) {
     for (unsigned int i = 0; i <= self->last; i++) {
@@ -164,14 +164,12 @@ void bignum_blind_add(Bignum* r, Bignum* a, Bignum* b) {
     unsigned char na;
     unsigned char nb;
     unsigned char tmp;
-    for (unsigned int i = 0; i <= a->last+1; i++) {
+    for (unsigned int i = 0; i <= a->last + 1; i++) {
       na = i > a->last ? 0 : a->digits[i];
       nb = i > b->last ? 0 : b->digits[i];
 
-      
-
       tmp = na + nb + carry;
-      //printf("(%lu)+(%lu)+[%lu]=(%lu)\n", na, nb, carry, tmp);
+      // printf("(%lu)+(%lu)+[%lu]=(%lu)\n", na, nb, carry, tmp);
       if (tmp >= 10) {
         carry = 1;
         bignum_set_digit(r, i, tmp % 10);
