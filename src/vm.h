@@ -113,53 +113,6 @@ StateKind vm_pop_state(VM* self) {
   // return (StateKind)*element_get_int(list_pop(self->state_stack, e));
 }
 
-void vm_add_primary(VM* self, const char* token, void (*callback)(VM*)) {
-  static Element* e;
-  if (!e) e = newElement();
-
-  e->kind = ELEMENT_WORD_PRIMARY;
-  dictionary_add(self->dictionaries[STATE_NORMAL], token,
-                 element_set_pword(e, callback));
-}
-
-void vm_add_secondary(VM* self, const char* token, List* source) {
-  static Element* e;
-  if (!e) e = newElement();
-
-  e->kind = ELEMENT_WORD_SECONDARY;
-  dictionary_add(self->dictionaries[STATE_NORMAL], token,
-                 element_set_sword(e, source));
-}
-
-void vm_add_compile(VM* self, const char* token, void (*callback)(VM*)) {
-  static Element* e;
-  if (!e) e = newElement();
-
-  e->kind = ELEMENT_WORD_PRIMARY;
-  dictionary_add(self->dictionaries[STATE_COMPILE], token,
-                 element_set_pword(e, callback));
-}
-
-void vm_push_wordbuffer(VM* self, const char* token) {
-  static Element* e;
-  if (!e) e = newElement();
-
-  list_push(self->word_buffer, element_set_cstring(e, token));
-}
-const char* vm_pop_wordbuffer(VM* self) {
-  static Element* e;
-  if (!e) e = newElement();
-
-  return element_get_cstring(list_pop(self->word_buffer, e));
-}
-
-void vm_push_value(VM* self, Element* value) {
-  list_push(self->value_stack, value);
-}
-Element* vm_pop_value(VM* self, Element* value) {
-  return list_pop(self->value_stack, value);
-}
-
 char* vm_namespace(VM* self) {
   // // FIXME will fail with huge namespaces
   // char* namespace = calloc(2048, 1);
@@ -190,6 +143,70 @@ const char* vm_pop_namespace(VM* self) {
         "Can't leave namespace while not inside "
         "namespace");
   return element_get_cstring(list_pop(self->namespace_stack, e));
+}
+
+const char* vm_spacename(VM* self, const char* token) {
+  char* namespace = vm_namespace(self);
+  size_t namespace_length = strlen(namespace);
+  size_t token_length = strlen(token);
+  char* spacename = calloc(token_length + namespace_length + 1, 1);
+
+  if (namespace[0]) {
+    strcpy(spacename, namespace);
+    strcat(spacename, ".");
+    strcat(spacename, token);
+  } else {
+    strcat(spacename, token);
+  }
+
+  free(namespace);
+  return spacename;
+}
+
+void vm_add_primary(VM* self, const char* token, void (*callback)(VM*)) {
+  static Element* e;
+  if (!e) e = newElement();
+
+  e->kind = ELEMENT_WORD_PRIMARY;
+  dictionary_add(self->dictionaries[STATE_NORMAL], vm_spacename(self, token),
+                 element_set_pword(e, callback));
+}
+
+void vm_add_secondary(VM* self, const char* token, List* source) {
+  static Element* e;
+  if (!e) e = newElement();
+
+  e->kind = ELEMENT_WORD_SECONDARY;
+  dictionary_add(self->dictionaries[STATE_NORMAL], vm_spacename(self, token),
+                 element_set_sword(e, source));
+}
+
+void vm_add_compile(VM* self, const char* token, void (*callback)(VM*)) {
+  static Element* e;
+  if (!e) e = newElement();
+
+  e->kind = ELEMENT_WORD_PRIMARY;
+  dictionary_add(self->dictionaries[STATE_COMPILE], vm_spacename(self, token),
+                 element_set_pword(e, callback));
+}
+
+void vm_push_wordbuffer(VM* self, const char* token) {
+  static Element* e;
+  if (!e) e = newElement();
+  list_push(self->word_buffer, element_set_cstring(e, token));
+}
+const char* vm_pop_wordbuffer(VM* self) {
+  static Element* e;
+  if (!e) e = newElement();
+
+  return element_get_cstring(list_pop(self->word_buffer, e));
+}
+
+void vm_push_value(VM* self, Element* value) {
+  list_push(self->value_stack, value);
+}
+Element* vm_pop_value(VM* self, Element* value) {
+  return list_pop(self->value_stack, value);
 }
 
 Element* vm_find_word(VM* self, const char* token) {
@@ -239,8 +256,10 @@ int vm_do(VM* self, const char* token) {
   switch (state) {
     case STATE_NORMAL:
       // fprintf(stderr, " - inside NORMAL\n");
-      if (dictionary_has_key(self->dictionaries[STATE_NORMAL], token)) {
-        e = dictionary_get(self->dictionaries[STATE_NORMAL], token);
+      e = vm_find_word(self, token);
+      if (e) {
+        // if (dictionary_has_key(self->dictionaries[STATE_NORMAL], token)) {
+        //  e = dictionary_get(self->dictionaries[STATE_NORMAL], token);
         if (e->kind == ELEMENT_WORD_PRIMARY) {
           // fprintf(stderr, " - found prime\n");
           element_get_pword(e)(self);

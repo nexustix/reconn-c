@@ -63,7 +63,7 @@ void _enter(VM *self) {
   if (!e) e = newElement();
   vm_pop_value(self, e);
   assert(e->kind == ELEMENT_BIGNUM);
-  printf("entering >%s<\n", bignum_to_cstring(element_get_bignum(e)));
+  // printf("entering >%s<\n", bignum_to_cstring(element_get_bignum(e)));
   vm_push_namespace(self, bignum_to_cstring(element_get_bignum(e)));
 }
 
@@ -120,6 +120,9 @@ int main(int argc, const char *argv[]) {
     printf("nothing\n");
   }
   */
+
+  // vm_push_namespace(pip, "cake.toast");
+  // printf("%s\n", vm_spacename(pip, "cheese"));
 
   return 0;
 }
