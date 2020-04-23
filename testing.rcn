@@ -1,0 +1,7 @@
+
+def main
+  "hello" println
+  "this code is inside a file" println
+end
+
+main

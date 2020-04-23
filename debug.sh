@@ -1,5 +1,10 @@
 premake5 gmake2
 make
-./bin/Debug/cstarter
 
+#
 
+if [ $# -gt 0 ]; then
+  ./bin/Debug/cstarter $@
+else
+  rlwrap -S ">" ./bin/Debug/cstarter $@
+fi

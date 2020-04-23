@@ -36,6 +36,7 @@ void _end_compile(VM *self) {
   self->word_buffer->top = 0;
 }
 
+// TODO implement
 void _do(VM *self) {}
 
 void _println(VM *self) {
@@ -69,60 +70,61 @@ void _enter(VM *self) {
 
 void _leave(VM *self) { vm_pop_namespace(self); }
 
+void register_words(VM *vm) {
+  vm_add_primary(vm, "def", _def);
+  vm_add_compile(vm, "def", _def_compile);
+  vm_add_compile(vm, "end", _end_compile);
+
+  vm_add_primary(vm, "println", _println);
+  vm_add_primary(vm, "s", _print_value_stack);
+
+  vm_add_primary(vm, "add", voc_mat_ari_add);
+  vm_add_primary(vm, "sub", voc_mat_ari_sub);
+  vm_add_primary(vm, "+", voc_mat_ari_add);
+  vm_add_primary(vm, "-", voc_mat_ari_sub);
+
+  vm_add_primary(vm, "namespace", _print_namespace);
+  vm_add_primary(vm, "#enter", _enter);
+  vm_add_primary(vm, "#leave", _leave);
+
+  vm_add_primary(vm, "spam", _spam);
+  vm_add_primary(vm, "cake.spam", _spam);
+  vm_add_primary(vm, "wonderful", _wonderful);
+}
+
 int main(int argc, const char *argv[]) {
-  VM *pip = newVM();
-
-  vm_add_primary(pip, "def", _def);
-  vm_add_compile(pip, "def", _def_compile);
-  vm_add_compile(pip, "end", _end_compile);
-
-  vm_add_primary(pip, "println", _println);
-  vm_add_primary(pip, "s", _print_value_stack);
-
-  vm_add_primary(pip, "add", voc_mat_ari_add);
-  vm_add_primary(pip, "sub", voc_mat_ari_sub);
-  vm_add_primary(pip, "+", voc_mat_ari_add);
-  vm_add_primary(pip, "-", voc_mat_ari_sub);
-
-  vm_add_primary(pip, "namespace", _print_namespace);
-  vm_add_primary(pip, "#enter", _enter);
-  vm_add_primary(pip, "#leave", _leave);
-
-  vm_add_primary(pip, "spam", _spam);
-  vm_add_primary(pip, "cake.spam", _spam);
-  vm_add_primary(pip, "wonderful", _wonderful);
-
   List *tokens = newList(16);
-
   size_t size;
   char *data = malloc(1024);
+  size_t tbd;
 
-  printf("Reconn REPL\n");
-  printf("Version: INDEV\n");
-  while (1) {
-    // printf("\n>");
-    getline(&data, &size, stdin);
-    parse_tokens(data, tokens);
-    // for (unsigned long i=1; i<= tokens->top; i++){
-    // printf(" >%s< ", element_get_cstring(list_get_at(tokens, i)));
-    //}
-    // printf("\n");
-    vm_execute_all(pip, tokens, 1);
-    tokens->top = 0;
+  VM *vm = newVM();
+  register_words(vm);
+
+  FILE *handle = NULL;
+
+  // printf("argc >%d<\n", argc);
+
+  if (argc > 1) {
+    handle = fopen(argv[1], "r");
   }
-
-  /*
-  vm_push_namespace(pip, "cake.toast");
-  Element *e = vm_find_word(pip, "bake");
-  if (e) {
-    printf("something >%s<\n", e->id);
+  if (handle) {
+    while ((tbd = getline(&data, &size, handle)) != -1) {
+      parse_tokens(data, tokens);
+      vm_execute_all(vm, tokens, 0);
+      tokens->top = 0;
+    }
+    fclose(handle);
   } else {
-    printf("nothing\n");
+    printf("Reconn REPL\n");
+    printf("Version: INDEV\n");
+    while (1) {
+      getline(&data, &size, stdin);
+      parse_tokens(data, tokens);
+      vm_execute_all(vm, tokens, 1);
+      tokens->top = 0;
+    }
   }
-  */
-
-  // vm_push_namespace(pip, "cake.toast");
-  // printf("%s\n", vm_spacename(pip, "cheese"));
 
   return 0;
 }
