@@ -8,6 +8,8 @@
 #include "util.h"
 #include "vm.h"
 
+#include "vocabularies/math/arithmetic.h"
+
 void _spam(VM *self) { printf("Spam\n"); }
 void _wonderful(VM *self) { printf("Wonderful Spam\n"); }
 
@@ -46,6 +48,7 @@ void _println(VM *self) {
   //printf(">%s<\n", element_get_bignum(e)->digits);
   //printf("%s\n", bn->digits);
   printf("%s\n", bignum_to_cstring(element_get_bignum(e)));
+  free(e);
 }
 
 void _print_value_stack(VM *self) {
@@ -61,15 +64,20 @@ int main(int argc, const char *argv[]) {
   
   VM *pip = newVM();
 
-  vm_add_primary(pip, "spam", _spam);
-  vm_add_primary(pip, "wonderful", _wonderful);
-
   vm_add_primary(pip, "def", _def);
   vm_add_compile(pip, "def", _def_compile);
   vm_add_compile(pip, "end", _end_compile);
 
   vm_add_primary(pip, "println", _println);
   vm_add_primary(pip, "s", _print_value_stack);
+
+  vm_add_primary(pip, "spam", _spam);
+  vm_add_primary(pip, "wonderful", _wonderful);
+
+  vm_add_primary(pip, "add", voc_mat_ari_add);
+  vm_add_primary(pip, "sub", voc_mat_ari_sub);
+  vm_add_primary(pip, "+", voc_mat_ari_add);
+  vm_add_primary(pip, "-", voc_mat_ari_sub);
 
   List *tokens = newList(16);
 

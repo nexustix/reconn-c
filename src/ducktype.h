@@ -69,7 +69,7 @@ Element *ducktype_as_bignum(const char *token, unsigned short base){
         //bignum_set_digit(bn, index, tmp_digit);
         bignum_set_digit(bn, i, tmp_digit);
         //bignum_set_digit(bn, bn->last, tmp_digit);
-      }else if (index==0){
+      }else if (length > 1 && index==0){
         if (cur == '-'){
           bn->negative = 1;
         }else if (cur == '+'){

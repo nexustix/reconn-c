@@ -164,12 +164,15 @@ void bignum_blind_add(Bignum* r, Bignum* a, Bignum* b) {
     unsigned char na;
     unsigned char nb;
     unsigned char tmp;
-    for (unsigned int i = 0; i <= a->last; i++) {
+    for (unsigned int i = 0; i <= a->last+1; i++) {
       na = i > a->last ? 0 : a->digits[i];
       nb = i > b->last ? 0 : b->digits[i];
 
+      
+
       tmp = na + nb + carry;
-      if (tmp > 10) {
+      //printf("(%lu)+(%lu)+[%lu]=(%lu)\n", na, nb, carry, tmp);
+      if (tmp >= 10) {
         carry = 1;
         bignum_set_digit(r, i, tmp % 10);
       } else {
@@ -177,6 +180,7 @@ void bignum_blind_add(Bignum* r, Bignum* a, Bignum* b) {
         bignum_set_digit(r, i, tmp);
       }
     }
+    bignum_clean_zeroes(r);
 
   } else {
     bignum_blind_add(r, b, a);
