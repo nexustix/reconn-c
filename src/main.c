@@ -124,6 +124,33 @@ void _include(VM *self) {
   }
 }
 
+void _use(VM *self) {
+  static Element *e;
+  if (!e) e = newElement();
+
+  vm_pop_value(self, e);
+  assert(e->kind == ELEMENT_BIGNUM);
+  const char *use_name = bignum_to_cstring(element_get_bignum(e));
+
+  // if (use_name == "io") {
+  if (0) {
+  } else if (strcmp(use_name, "io") == 0) {
+  } else if (strcmp(use_name, "string") == 0) {
+  } else if (strcmp(use_name, "memory") == 0) {
+  } else if (strcmp(use_name, "stack") == 0) {
+  } else if (strcmp(use_name, "logic") == 0) {
+  } else if (strcmp(use_name, "flow") == 0) {
+  } else if (strcmp(use_name, "arithmetic") == 0) {
+    voc_mat_register_words(self);
+  } else if (strcmp(use_name, "file") == 0) {
+    // } else if (strcmp(use_name, "") == 0) {
+
+  } else {
+    fprintf(stderr, "<!> unable to find core module >%s<\n", use_name);
+    exit(1);
+  }
+}
+
 void register_words(VM *vm) {
   vm_add_primary(vm, "def", _def);
   vm_add_compile(vm, "def", _def_compile);
@@ -132,16 +159,12 @@ void register_words(VM *vm) {
   vm_add_primary(vm, "println", _println);
   vm_add_primary(vm, "s", _print_value_stack);
 
-  vm_add_primary(vm, "add", voc_mat_ari_add);
-  vm_add_primary(vm, "sub", voc_mat_ari_sub);
-  vm_add_primary(vm, "+", voc_mat_ari_add);
-  vm_add_primary(vm, "-", voc_mat_ari_sub);
-
   vm_add_primary(vm, "namespace", _print_namespace);
   vm_add_primary(vm, "#enter", _enter);
   vm_add_primary(vm, "#leave", _leave);
 
   vm_add_primary(vm, "#include", _include);
+  vm_add_primary(vm, "#use", _use);
 
   vm_add_primary(vm, "spam", _spam);
   vm_add_primary(vm, "cake.spam", _spam);

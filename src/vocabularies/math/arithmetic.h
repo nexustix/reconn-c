@@ -5,7 +5,7 @@
 #include "../../element.h"
 #include "../../vm.h"
 
-void voc_mat_ari_add(VM *vm) {
+void voc_mat_add(VM *vm) {
   Element *eb = vm_pop_value(vm, newElement());
   Element *ea = vm_pop_value(vm, newElement());
   static Element *er;
@@ -26,7 +26,7 @@ void voc_mat_ari_add(VM *vm) {
   free(b);
 }
 
-void voc_mat_ari_sub(VM *vm) {
+void voc_mat_sub(VM *vm) {
   Element *eb = vm_pop_value(vm, newElement());
   Element *ea = vm_pop_value(vm, newElement());
   static Element *er;
@@ -45,6 +45,13 @@ void voc_mat_ari_sub(VM *vm) {
 
   free(a);
   free(b);
+}
+
+void voc_mat_register_words(VM *vm) {
+  // vm_add_primary(vm, "add", voc_mat_ari_add);
+  // vm_add_primary(vm, "sub", voc_mat_ari_sub);
+  vm_add_primary(vm, "+", voc_mat_add);
+  vm_add_primary(vm, "-", voc_mat_sub);
 }
 
 #endif
