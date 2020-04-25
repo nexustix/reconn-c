@@ -1,14 +1,14 @@
+#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
-
-#include "bignum.h"
+//#include "bignum.h"
 #include "dictionary.h"
 #include "element.h"
 #include "list.h"
 #include "parse.h"
 #include "util.h"
 #include "vm.h"
-#include "vocabularies/math/arithmetic.h"
+//#include "vocabularies/math/arithmetic.h"
 
 // HACK
 static char *content_root;
@@ -48,11 +48,16 @@ void _println(VM *self) {
   static Element *e;
   if (!e) e = newElement();
   vm_pop_value(self, e);
-  assert(e->kind == ELEMENT_BIGNUM);
-  printf("%s\n", bignum_to_cstring(element_get_bignum(e)));
+  // assert(e->kind == ELEMENT_BIGNUM);
+  // printf("%s\n", bignum_to_cstring(element_get_bignum(e)));
+  assert(e->kind == ELEMENT_CSTRING);
+  printf("%s\n", element_get_cstring(e));
+  // FIXME investigate if contained string get's freed
   free(e);
 }
 
+// FIXME values are no longer just bignums
+/*
 void _print_value_stack(VM *self) {
   printf(" | ");
   for (unsigned long i = 1; i <= self->value_stack->top; i++) {
@@ -61,6 +66,7 @@ void _print_value_stack(VM *self) {
   }
   printf("|>\n");
 }
+*/
 
 void _print_namespace(VM *self) { printf(">%s<\n", vm_namespace(self)); }
 
@@ -68,9 +74,10 @@ void _enter(VM *self) {
   static Element *e;
   if (!e) e = newElement();
   vm_pop_value(self, e);
-  assert(e->kind == ELEMENT_BIGNUM);
-  // printf("entering >%s<\n", bignum_to_cstring(element_get_bignum(e)));
-  vm_push_namespace(self, bignum_to_cstring(element_get_bignum(e)));
+  // assert(e->kind == ELEMENT_BIGNUM);
+  // vm_push_namespace(self, bignum_to_cstring(element_get_bignum(e)));
+  assert(e->kind == ELEMENT_CSTRING);
+  vm_push_namespace(self, element_get_cstring(e));
 }
 
 void _leave(VM *self) { vm_pop_namespace(self); }
@@ -81,8 +88,10 @@ void _include(VM *self) {
   if (!e) e = newElement();
 
   vm_pop_value(self, e);
-  assert(e->kind == ELEMENT_BIGNUM);
-  const char *sub_path = bignum_to_cstring(element_get_bignum(e));
+  // assert(e->kind == ELEMENT_BIGNUM);
+  // const char *sub_path = bignum_to_cstring(element_get_bignum(e));
+  assert(e->kind == ELEMENT_CSTRING);
+  const char *sub_path = element_get_cstring(e);
 
   size_t content_root_length = strlen(content_root);
   size_t sub_path_length = strlen(content_root);
@@ -129,8 +138,10 @@ void _use(VM *self) {
   if (!e) e = newElement();
 
   vm_pop_value(self, e);
-  assert(e->kind == ELEMENT_BIGNUM);
-  const char *use_name = bignum_to_cstring(element_get_bignum(e));
+  // assert(e->kind == ELEMENT_BIGNUM);
+  // const char *use_name = bignum_to_cstring(element_get_bignum(e));
+  assert(e->kind == ELEMENT_CSTRING);
+  const char *use_name = element_get_cstring(e);
 
   // if (use_name == "io") {
   if (0) {
@@ -141,7 +152,7 @@ void _use(VM *self) {
   } else if (strcmp(use_name, "logic") == 0) {
   } else if (strcmp(use_name, "flow") == 0) {
   } else if (strcmp(use_name, "arithmetic") == 0) {
-    voc_mat_register_words(self);
+    // voc_mat_register_words(self);
   } else if (strcmp(use_name, "file") == 0) {
     // } else if (strcmp(use_name, "") == 0) {
 
@@ -157,7 +168,7 @@ void register_words(VM *vm) {
   vm_add_compile(vm, "end", _end_compile);
 
   vm_add_primary(vm, "println", _println);
-  vm_add_primary(vm, "s", _print_value_stack);
+  // vm_add_primary(vm, "s", _print_value_stack);
 
   vm_add_primary(vm, "namespace", _print_namespace);
   vm_add_primary(vm, "#enter", _enter);
@@ -191,8 +202,6 @@ int main(int argc, const char *argv[]) {
 
   FILE *handle = NULL;
 
-  printf("argc >%s<\n", content_root);
-
   if (argc > 1) {
     handle = fopen(argv[1], "r");
   }
@@ -213,8 +222,9 @@ int main(int argc, const char *argv[]) {
     }
     fclose(handle);
   } else {
-    printf("Reconn REPL\n");
-    printf("Version: INDEV\n");
+    fprintf(stderr, "Reconn REPL\n");
+    fprintf(stderr, "Version: INDEV\n");
+    fprintf(stderr, "RCNPATH: >%s<\n", content_root);
     while (1) {
       getline(&data, &size, stdin);
       parse_tokens(data, tokens);

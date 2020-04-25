@@ -84,7 +84,7 @@ StateKind vm_state(VM* self) {
   if (list_is_empty(self->state_stack)) {
     return STATE_NORMAL;
   }
-  return (StateKind)*element_get_int(
+  return (StateKind)*element_get_enum(
       list_get_at(self->state_stack, self->state_stack->top));
 
   // return STATE_NORMAL;
@@ -96,7 +96,7 @@ void vm_push_state(VM* self, StateKind state) {
 
   StateKind* tmp = malloc(sizeof(StateKind));
   *tmp = state;
-  list_push(self->state_stack, element_set_int(e, (int*)tmp));
+  list_push(self->state_stack, element_set_enum(e, (int*)tmp));
 }
 
 StateKind vm_pop_state(VM* self) {
@@ -107,7 +107,7 @@ StateKind vm_pop_state(VM* self) {
   error(!list_is_empty(self->state_stack),
         "tried popping from empty state stack");
   StateKind* state =
-      (StateKind*)element_get_int(list_pop(self->state_stack, e));
+      (StateKind*)element_get_enum(list_pop(self->state_stack, e));
   return *state;
   free(state);
   // return (StateKind)*element_get_int(list_pop(self->state_stack, e));
@@ -280,8 +280,8 @@ int vm_do(VM* self, const char* token) {
         if (element) {
           switch (element->kind) {
             case ELEMENT_CSTRING:
-              element_set_bignum(
-                  element, bignum_copy_cstring(element_get_cstring(element)));
+              // element_set_bignum(
+              //    element, bignum_copy_cstring(element_get_cstring(element)));
               vm_push_value(self, element);
               return 0;
               break;

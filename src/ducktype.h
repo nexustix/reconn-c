@@ -56,6 +56,7 @@ Element *ducktype_as_quote(const char *token, int remove_quotes) {
   return NULL;
 }
 
+/*
 // HACK
 Element *ducktype_as_bignum(const char *token, unsigned short base) {
   size_t length = strlen(token);
@@ -94,6 +95,7 @@ Element *ducktype_as_bignum(const char *token, unsigned short base) {
   bignum_clean_zeroes(bn);
   return element_set_bignum(e, bn);
 }
+*/
 
 Element *ducktype_as_whatever(const char *token, int remove_quotes) {
   Element *e = NULL;
@@ -101,8 +103,8 @@ Element *ducktype_as_whatever(const char *token, int remove_quotes) {
   if (e) return e;
   e = ducktype_as_string(token, remove_quotes);
   if (e) return e;
-  e = ducktype_as_bignum(token, 10);
-  if (e) return e;
+  // e = ducktype_as_bignum(token, 10);
+  // if (e) return e;
   return NULL;
 };
 
