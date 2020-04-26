@@ -32,4 +32,5 @@ void seplob(char* cstring, char sep) {
     cstring[0] = 0;
   }
 }
+
 #endif

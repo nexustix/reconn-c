@@ -97,14 +97,82 @@ Element *ducktype_as_bignum(const char *token, unsigned short base) {
 }
 */
 
-Element *ducktype_as_whatever(const char *token, int remove_quotes) {
+Element *ducktype_as_number(const char *token, int base) {
+  int is_signed = (token[0] == '-' || token[0] == '+');
+  char *endptr;
+
+  // handle number being 0
+  if (strcmp(token, "0") == 0) {
+    Element *e = newElement();
+    // element_give_u8(e, 0);
+    return e;
+  } else if ((strcmp(token, "+0") == 0) || (strcmp(token, "-0") == 0)) {
+    Element *e = newElement();
+    // element_give_i8(e, 0);
+    return e;
+  }
+
+  if (is_signed) {
+    intmax_t number = strtoimax(token, &endptr, base);
+    if (number) {
+      Element *e = newElement();
+      if (labs(number) <= INT8_MAX) {
+        char *v = calloc(1, sizeof(char));
+        *v = number;
+        element_set_i8(e, v);
+      } else if (labs(number) <= INT16_MAX) {
+        short *v = calloc(1, sizeof(short));
+        *v = number;
+        element_set_i16(e, v);
+      } else if (labs(number) <= INT32_MAX) {
+        long *v = calloc(1, sizeof(long));
+        *v = number;
+        element_set_i32(e, v);
+      } else if (number <= INT64_MAX) {
+        error(0, "64 bit integer support not implemented");
+      } else {
+        error(0, "number too large for maximum integer type");
+      }
+      return e;
+    }
+
+  } else {
+    uintmax_t number = strtoumax(token, &endptr, base);
+    if (number) {
+      Element *e = newElement();
+      if (number < +UINT8_MAX) {
+        unsigned char *v = calloc(1, sizeof(unsigned char));
+        *v = number;
+        element_set_u8(e, v);
+      } else if (number <= UINT16_MAX) {
+        unsigned short *v = calloc(1, sizeof(unsigned short));
+        *v = number;
+        element_set_u16(e, v);
+      } else if (number <= UINT32_MAX) {
+        unsigned long *v = calloc(1, sizeof(unsigned long));
+        *v = number;
+        element_set_u32(e, v);
+      } else if (number <= UINT64_MAX) {
+        error(0, "64 bit unsigned integer support not implemented");
+      } else {
+        error(0, "number too large for maximum unsigned integer type");
+      }
+      return e;
+    }
+  }
+  return NULL;
+}
+
+Element *ducktype_as_whatever(const char *token, int base) {
   Element *e = NULL;
-  e = ducktype_as_quote(token, remove_quotes);
+  e = ducktype_as_quote(token, 1);
   if (e) return e;
-  e = ducktype_as_string(token, remove_quotes);
+  e = ducktype_as_string(token, 1);
   if (e) return e;
   // e = ducktype_as_bignum(token, 10);
   // if (e) return e;
+  e = ducktype_as_number(token, base);
+  if (e) return e;
   return NULL;
 };
 

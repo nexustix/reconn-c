@@ -40,7 +40,7 @@ typedef struct VM {
   int comment;
   int running;
 
-  unsigned int base;
+  int base;
 } VM;
 
 void (*element_get_pword(Element* self))(VM*) {
@@ -276,7 +276,7 @@ int vm_do(VM* self, const char* token) {
           error(0, "non-word in dictionary");
         }
       } else {
-        Element* element = ducktype_as_whatever(token, 1);
+        Element* element = ducktype_as_whatever(token, self->base);
         if (element) {
           switch (element->kind) {
             case ELEMENT_CSTRING:
@@ -286,7 +286,17 @@ int vm_do(VM* self, const char* token) {
               return 0;
               break;
 
-            case ELEMENT_BIGNUM:
+              // case ELEMENT_BIGNUM:
+              //  vm_push_value(self, element);
+              //  return 0;
+              //  break;
+
+            case ELEMENT_I8:
+            case ELEMENT_I16:
+            case ELEMENT_I32:
+            case ELEMENT_U8:
+            case ELEMENT_U16:
+            case ELEMENT_U32:
               vm_push_value(self, element);
               return 0;
               break;

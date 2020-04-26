@@ -57,16 +57,22 @@ void _println(VM *self) {
 }
 
 // FIXME values are no longer just bignums
-/*
+
 void _print_value_stack(VM *self) {
-  printf(" | ");
+  Element *e;
+  // printf(" | ");
+  printf(" ");
   for (unsigned long i = 1; i <= self->value_stack->top; i++) {
-    printf("[%s] ", bignum_to_cstring(
-                        element_get_bignum(list_get_at(self->value_stack, i))));
+    // printf("[%s] ", bignum_to_cstring(
+    //                    element_get_bignum(list_get_at(self->value_stack,
+    //                    i))));
+    e = list_get_at(self->value_stack, i);
+    // printf("(%d)[%s] ", e->kind, element_to_cstring(e));
+    printf("[%s] ", element_to_cstring(e));
   }
-  printf("|>\n");
+  // printf("|>");
+  printf("\n");
 }
-*/
 
 void _print_namespace(VM *self) { printf(">%s<\n", vm_namespace(self)); }
 
@@ -168,7 +174,7 @@ void register_words(VM *vm) {
   vm_add_compile(vm, "end", _end_compile);
 
   vm_add_primary(vm, "println", _println);
-  // vm_add_primary(vm, "s", _print_value_stack);
+  vm_add_primary(vm, "s", _print_value_stack);
 
   vm_add_primary(vm, "namespace", _print_namespace);
   vm_add_primary(vm, "#enter", _enter);
@@ -232,6 +238,30 @@ int main(int argc, const char *argv[]) {
       tokens->top = 0;
     }
   }
+
+  /*
+  Element *e = newElement();
+  // element_give_i8(e, 42);
+  // element_give_i16(e, 42);
+  element_give_u32(e, 3587);
+  // char data = 123;
+  // e->data = &data;
+  // e->kind = ELEMENT_I8;
+  // char redata;
+
+  char *endptr;
+
+  // redata = *(char *)e->data;
+
+  // printf("%d\n", redata);
+  printf("%d\n", element_take_i8(e));
+
+  short testa = (2000 * 34) / 100;
+  printf("%d\n", testa);
+
+  intmax_t cake = strtoimax("+1234", &endptr, 10);
+  printf("%li\n", cake);
+  */
 
   return 0;
 }
