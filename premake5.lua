@@ -1,6 +1,6 @@
 require("mingw64")
 
-workspace "WS_cstarter"
+workspace "WS_reconn"
     configurations { "Debug", "Release" }
     platforms { "l64", "w64"}
     filter { "platforms:l64" }
@@ -13,15 +13,28 @@ workspace "WS_cstarter"
         toolset ("mingw64")
         --entrypoint "WinMainCRTStartup"
 
-project "cstarter"
-    location "build/cstarter/"
+project "apireconn"
+  location "build/apireconn/"
+  kind "SharedLib"
+  language "C"
+
+  targetdir "lib/apireconn"
+
+  files { "./src/apireconn/**.h", "./src/apireconn/**.c" }
+
+project "reconn"
+    location "build/reconn/"
     --kind "ConsoleApp"
     kind "WindowedApp"
     language "C"
     targetdir "bin/%{cfg.buildcfg}"
-    --links { "allegro", "allegro_ttf", "allegro_font", "allegro_color", "allegro_primitives" }
 
-    files { "./src/**.h", "./src/**.c" }
+    libdirs { "./lib/apireconn"}
+    includedirs { "./src/apireconn/" }
+    --links { "allegro", "allegro_ttf", "allegro_font", "allegro_color", "allegro_primitives" }
+    links { "apireconn" }
+
+    files { "./src/reconn/**.h", "./src/reconn/**.c" }
 
     filter "configurations:Debug"
         defines { "DEBUG" }

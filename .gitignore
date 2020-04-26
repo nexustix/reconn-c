@@ -1,6 +1,7 @@
 _discard/
 _legacy/
 bin/
+lib/
 obj/
 build/
 

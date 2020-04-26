@@ -1,4 +1,5 @@
 #include <assert.h>
+//#include <reconnapi.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -6,9 +7,9 @@
 #include "element.h"
 #include "list.h"
 #include "parse.h"
+#include "test.h"
 #include "util.h"
 #include "vm.h"
-
 // HACK
 static char *content_root;
 
@@ -204,6 +205,8 @@ int main(int argc, const char *argv[]) {
   size_t size;
   char *data = malloc(1024);
   size_t tbd;
+
+  bake_cake("strawberry");
 
   // char *content_root = getenv("RCNPATH");
   content_root = getenv("RCNPATH");
