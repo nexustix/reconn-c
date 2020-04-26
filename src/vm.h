@@ -43,11 +43,11 @@ typedef struct VM {
   int base;
 } VM;
 
-void (*element_get_pword(Element* self))(VM*) {
-  return (void (*)(VM*))self->data;
+int (*element_get_pword(Element* self))(VM*) {
+  return (int (*)(VM*))self->data;
 }
 
-Element* element_set_pword(Element* destination, void (*source)(VM*)) {
+Element* element_set_pword(Element* destination, int (*source)(VM*)) {
   destination->data = (void*)source;
   destination->kind = ELEMENT_WORD_PRIMARY;
   return destination;
@@ -163,7 +163,7 @@ const char* vm_spacename(VM* self, const char* token) {
   return spacename;
 }
 
-void vm_add_primary(VM* self, const char* token, void (*callback)(VM*)) {
+void vm_add_primary(VM* self, const char* token, int (*callback)(VM*)) {
   static Element* e;
   if (!e) e = newElement();
 
@@ -181,7 +181,7 @@ void vm_add_secondary(VM* self, const char* token, List* source) {
                  element_set_sword(e, source));
 }
 
-void vm_add_compile(VM* self, const char* token, void (*callback)(VM*)) {
+void vm_add_compile(VM* self, const char* token, int (*callback)(VM*)) {
   static Element* e;
   if (!e) e = newElement();
 

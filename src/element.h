@@ -102,7 +102,7 @@ void element_set_u32(Element* self, unsigned long* value) {
 
 // Functions for taking ints
 
-char element_take_i8(Element* self, int free) {
+char element_take_i8(Element* self, int cleanup) {
   char r = 0;
   switch (self->kind) {
     case ELEMENT_I8:
@@ -128,11 +128,11 @@ char element_take_i8(Element* self, int free) {
       error(0, "unable to take i8");
       break;
   }
-  // free(self->data);
+  if (cleanup) free(self->data);
   return r;
 }
 
-short element_take_i16(Element* self, int free) {
+short element_take_i16(Element* self, int cleanup) {
   short r = 0;
   switch (self->kind) {
     case ELEMENT_I8:
@@ -158,11 +158,11 @@ short element_take_i16(Element* self, int free) {
       error(0, "unable to take i16");
       break;
   }
-  // free(self->data);
+  if (cleanup) free(self->data);
   return r;
 }
 
-long element_take_i32(Element* self, int free) {
+long element_take_i32(Element* self, int cleanup) {
   long r = 0;
   switch (self->kind) {
     case ELEMENT_I8:
@@ -188,11 +188,11 @@ long element_take_i32(Element* self, int free) {
       error(0, "unable to take i32");
       break;
   }
-  // free(self->data);
+  if (cleanup) free(self->data);
   return r;
 }
 
-unsigned char element_take_u8(Element* self, int free) {
+unsigned char element_take_u8(Element* self, int cleanup) {
   unsigned char r = 0;
   switch (self->kind) {
     case ELEMENT_I8:
@@ -218,11 +218,11 @@ unsigned char element_take_u8(Element* self, int free) {
       error(0, "unable to take u8");
       break;
   }
-  // free(self->data);
+  if (cleanup) free(self->data);
   return r;
 }
 
-unsigned short element_take_u16(Element* self, int free) {
+unsigned short element_take_u16(Element* self, int cleanup) {
   unsigned short r = 0;
   switch (self->kind) {
     case ELEMENT_I8:
@@ -248,11 +248,11 @@ unsigned short element_take_u16(Element* self, int free) {
       error(0, "unable to take u16");
       break;
   }
-  // free(self->data);
+  if (cleanup) free(self->data);
   return r;
 }
 
-unsigned long element_take_u32(Element* self, int free) {
+unsigned long element_take_u32(Element* self, int cleanup) {
   unsigned long r = 0;
   switch (self->kind) {
     case ELEMENT_I8:
@@ -278,54 +278,48 @@ unsigned long element_take_u32(Element* self, int free) {
       error(0, "unable to take u32");
       break;
   }
-  // free(self->data);
+
+  if (cleanup) free(self->data);
   return r;
 }
 
-const char* element_to_cstring(Element* self) {
+const char* element_data_to_cstring(Element* self) {
   char* tmp_str;
   switch (self->kind) {
     case ELEMENT_CSTRING:
-      tmp_str = (char*)calloc(strlen((char*)self->data), sizeof(char));
+      tmp_str = (char*)calloc(strlen((char*)self->data) + 1, sizeof(char));
       strcpy(tmp_str, (char*)self->data);
       return tmp_str;
       break;
 
     case ELEMENT_I8:
-      // const char tmp_str[5];
-      tmp_str = calloc(5 + 5, sizeof(char));
-
-      sprintf(tmp_str, "i8:%hhi", *(char*)self->data);
+      tmp_str = (char*)calloc(5, sizeof(char));
+      sprintf(tmp_str, "%hhi", *(char*)self->data);
       return tmp_str;
       break;
     case ELEMENT_I16:
-      // const char tmp_str[7];
-      tmp_str = calloc(7 + 5, sizeof(short));
-      sprintf(tmp_str, "i16:%hi", *(short*)self->data);
+      tmp_str = (char*)calloc(7, sizeof(short));
+      sprintf(tmp_str, "%hi", *(short*)self->data);
       return tmp_str;
       break;
     case ELEMENT_I32:
-      // const char tmp_str[22];
-      tmp_str = calloc(22 + 5, sizeof(long));
-      sprintf(tmp_str, "i32:%li", *(long*)self->data);
+      tmp_str = (char*)calloc(22, sizeof(long));
+      sprintf(tmp_str, "%li", *(long*)self->data);
       return tmp_str;
       break;
     case ELEMENT_U8:
-      // const char tmp_str[5];
-      tmp_str = calloc(5 + 5, sizeof(unsigned char));
-      sprintf(tmp_str, "u8:%hhu", *(unsigned char*)self->data);
+      tmp_str = (char*)calloc(5, sizeof(unsigned char));
+      sprintf(tmp_str, "%hhu", *(unsigned char*)self->data);
       return tmp_str;
       break;
     case ELEMENT_U16:
-      // const char tmp_str[7];
-      tmp_str = calloc(7 + 5, sizeof(unsigned short));
-      sprintf(tmp_str, "u16:%hu", *(unsigned short*)self->data);
+      tmp_str = (char*)calloc(7, sizeof(unsigned short));
+      sprintf(tmp_str, "%hu", *(unsigned short*)self->data);
       return tmp_str;
       break;
     case ELEMENT_U32:
-      // const char tmp_str[22];
-      tmp_str = calloc(22 + 5, sizeof(unsigned long));
-      sprintf(tmp_str, "u32:%lu", *(unsigned long*)self->data);
+      tmp_str = (char*)calloc(22, sizeof(unsigned long));
+      sprintf(tmp_str, "%lu", *(unsigned long*)self->data);
       return tmp_str;
       break;
 
@@ -336,6 +330,63 @@ const char* element_to_cstring(Element* self) {
   return "N/A";
 }
 
-// element_is_integer(Element* self) {}
+const char* element_kind_to_cstring(Element* self) {
+  switch (self->kind) {
+    case ELEMENT_CSTRING:
+      return "string";
+      break;
+
+    case ELEMENT_I8:
+      return "i8";
+      break;
+    case ELEMENT_I16:
+      return "i16";
+      break;
+    case ELEMENT_I32:
+      return "i32";
+      break;
+    case ELEMENT_U8:
+      return "u8";
+      break;
+    case ELEMENT_U16:
+      return "u16";
+      break;
+    case ELEMENT_U32:
+      return "u32";
+      break;
+
+    default:
+      return "???";
+      break;
+  }
+}
+
+int element_is_signed_integer(Element* self) {
+  switch (self->kind) {
+    case ELEMENT_I8:
+    case ELEMENT_I16:
+    case ELEMENT_I32:
+      return 1;
+      break;
+
+    default:
+      return 0;
+      break;
+  }
+}
+
+int element_is_unsigned_integer(Element* self) {
+  switch (self->kind) {
+    case ELEMENT_U8:
+    case ELEMENT_U16:
+    case ELEMENT_U32:
+      return 1;
+      break;
+
+    default:
+      return 0;
+      break;
+  }
+}
 
 #endif

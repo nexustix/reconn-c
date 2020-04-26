@@ -14,17 +14,21 @@
 static char *content_root;
 // char *get_content_root() { return content_root; }
 
-void _spam(VM *self) { printf("Spam\n"); }
-void _wonderful(VM *self) { printf("Wonderful Spam\n"); }
+// void _spam(VM *self) { printf("Spam\n"); }
+// void _wonderful(VM *self) { printf("Wonderful Spam\n"); }
 
-void _def(VM *self) { vm_push_state(self, STATE_COMPILE); }
-
-void _def_compile(VM *self) {
-  vm_push_state(self, STATE_HARD);
-  vm_push_wordbuffer(self, TOKEN_DEF);
+int _def(VM *self) {
+  vm_push_state(self, STATE_COMPILE);
+  return 0;
 }
 
-void _end_compile(VM *self) {
+int _def_compile(VM *self) {
+  vm_push_state(self, STATE_HARD);
+  vm_push_wordbuffer(self, TOKEN_DEF);
+  return 0;
+}
+
+int _end_compile(VM *self) {
   static Element *e;
   if (!e) e = newElement();
 
@@ -39,12 +43,13 @@ void _end_compile(VM *self) {
   vm_add_secondary(self, element_get_cstring(e), new_word);
   vm_pop_state(self);
   self->word_buffer->top = 0;
+  return 0;
 }
 
 // TODO implement
-void _do(VM *self) {}
+// void _do(VM *self) {}
 
-void _println(VM *self) {
+int _println(VM *self) {
   static Element *e;
   if (!e) e = newElement();
   vm_pop_value(self, e);
@@ -54,29 +59,38 @@ void _println(VM *self) {
   printf("%s\n", element_get_cstring(e));
   // FIXME investigate if contained string get's freed
   free(e);
+  return 0;
 }
 
 // FIXME values are no longer just bignums
 
-void _print_value_stack(VM *self) {
-  Element *e;
+int _print_value_stack(VM *self) {
+  static Element *e;
+  if (!e) e = newElement();
+  // Element *e;
+  unsigned long index = 0;
   // printf(" | ");
   printf(" ");
-  for (unsigned long i = 1; i <= self->value_stack->top; i++) {
+  for (unsigned long i = 0; i < self->value_stack->top; i++) {
+    index = self->value_stack->top - i;
     // printf("[%s] ", bignum_to_cstring(
     //                    element_get_bignum(list_get_at(self->value_stack,
     //                    i))));
-    e = list_get_at(self->value_stack, i);
+    e = list_get_at(self->value_stack, index);
     // printf("(%d)[%s] ", e->kind, element_to_cstring(e));
-    printf("[%s] ", element_to_cstring(e));
+    printf("(%s)[%s] ", element_kind_to_cstring(e), element_data_to_cstring(e));
   }
   // printf("|>");
   printf("\n");
+  return 0;
 }
 
-void _print_namespace(VM *self) { printf(">%s<\n", vm_namespace(self)); }
+int _print_namespace(VM *self) {
+  printf(">%s<\n", vm_namespace(self));
+  return 0;
+}
 
-void _enter(VM *self) {
+int _enter(VM *self) {
   static Element *e;
   if (!e) e = newElement();
   vm_pop_value(self, e);
@@ -84,12 +98,16 @@ void _enter(VM *self) {
   // vm_push_namespace(self, bignum_to_cstring(element_get_bignum(e)));
   assert(e->kind == ELEMENT_CSTRING);
   vm_push_namespace(self, element_get_cstring(e));
+  return 0;
 }
 
-void _leave(VM *self) { vm_pop_namespace(self); }
+int _leave(VM *self) {
+  vm_pop_namespace(self);
+  return 0;
+}
 
 // HACK
-void _include(VM *self) {
+int _include(VM *self) {
   static Element *e;
   if (!e) e = newElement();
 
@@ -137,9 +155,10 @@ void _include(VM *self) {
     }
     fclose(handle);
   }
+  return 0;
 }
 
-void _use(VM *self) {
+int _use(VM *self) {
   static Element *e;
   if (!e) e = newElement();
 
@@ -166,6 +185,7 @@ void _use(VM *self) {
     fprintf(stderr, "<!> unable to find core module >%s<\n", use_name);
     exit(1);
   }
+  return 0;
 }
 
 void register_words(VM *vm) {
@@ -183,9 +203,9 @@ void register_words(VM *vm) {
   vm_add_primary(vm, "#include", _include);
   vm_add_primary(vm, "#use", _use);
 
-  vm_add_primary(vm, "spam", _spam);
-  vm_add_primary(vm, "cake.spam", _spam);
-  vm_add_primary(vm, "wonderful", _wonderful);
+  // vm_add_primary(vm, "spam", _spam);
+  // vm_add_primary(vm, "cake.spam", _spam);
+  // vm_add_primary(vm, "wonderful", _wonderful);
 }
 
 int main(int argc, const char *argv[]) {

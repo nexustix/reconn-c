@@ -117,18 +117,18 @@ Element *ducktype_as_number(const char *token, int base) {
     if (number) {
       Element *e = newElement();
       if (labs(number) <= INT8_MAX) {
-        char *v = calloc(1, sizeof(char));
+        char *v = (char *)calloc(1, sizeof(char));
         *v = number;
         element_set_i8(e, v);
       } else if (labs(number) <= INT16_MAX) {
-        short *v = calloc(1, sizeof(short));
+        short *v = (short *)calloc(1, sizeof(short));
         *v = number;
         element_set_i16(e, v);
       } else if (labs(number) <= INT32_MAX) {
-        long *v = calloc(1, sizeof(long));
+        long *v = (long *)calloc(1, sizeof(long));
         *v = number;
         element_set_i32(e, v);
-      } else if (number <= INT64_MAX) {
+      } else if (labs(number) <= INT64_MAX) {
         error(0, "64 bit integer support not implemented");
       } else {
         error(0, "number too large for maximum integer type");
@@ -140,16 +140,16 @@ Element *ducktype_as_number(const char *token, int base) {
     uintmax_t number = strtoumax(token, &endptr, base);
     if (number) {
       Element *e = newElement();
-      if (number < +UINT8_MAX) {
-        unsigned char *v = calloc(1, sizeof(unsigned char));
+      if (number <= UINT8_MAX) {
+        unsigned char *v = (unsigned char *)calloc(1, sizeof(unsigned char));
         *v = number;
         element_set_u8(e, v);
       } else if (number <= UINT16_MAX) {
-        unsigned short *v = calloc(1, sizeof(unsigned short));
+        unsigned short *v = (unsigned short *)calloc(1, sizeof(unsigned short));
         *v = number;
         element_set_u16(e, v);
       } else if (number <= UINT32_MAX) {
-        unsigned long *v = calloc(1, sizeof(unsigned long));
+        unsigned long *v = (unsigned long *)calloc(1, sizeof(unsigned long));
         *v = number;
         element_set_u32(e, v);
       } else if (number <= UINT64_MAX) {
