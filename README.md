@@ -20,4 +20,4 @@
 ## Why that name ?
   I was unable to come up with a reasonable name and chose "Reconn" as a WIP name and it stuck (for now)
 
-  It was chosen as a combination of the word "Reconnect" (because i want to use it to reconnect to a low-level of programming and file formats that are hard or annoying to write buy hand) and "Recon" (because i want to use it to survey and evaluate stack-based languages)
+  It was chosen as a combination of the word "Reconnect" (because i want to use it to reconnect to a low-level of programming and file formats that are hard or annoying to write by hand) and "Recon" (because i want to use it to survey and evaluate stack-based languages)
