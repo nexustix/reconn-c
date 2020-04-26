@@ -1,21 +1,16 @@
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
-//#include "bignum.h"
+
 #include "dictionary.h"
 #include "element.h"
 #include "list.h"
 #include "parse.h"
 #include "util.h"
 #include "vm.h"
-//#include "vocabularies/math/arithmetic.h"
 
 // HACK
 static char *content_root;
-// char *get_content_root() { return content_root; }
-
-// void _spam(VM *self) { printf("Spam\n"); }
-// void _wonderful(VM *self) { printf("Wonderful Spam\n"); }
 
 int _def(VM *self) {
   vm_push_state(self, STATE_COMPILE);
@@ -202,10 +197,6 @@ void register_words(VM *vm) {
 
   vm_add_primary(vm, "#include", _include);
   vm_add_primary(vm, "#use", _use);
-
-  // vm_add_primary(vm, "spam", _spam);
-  // vm_add_primary(vm, "cake.spam", _spam);
-  // vm_add_primary(vm, "wonderful", _wonderful);
 }
 
 int main(int argc, const char *argv[]) {
@@ -258,30 +249,6 @@ int main(int argc, const char *argv[]) {
       tokens->top = 0;
     }
   }
-
-  /*
-  Element *e = newElement();
-  // element_give_i8(e, 42);
-  // element_give_i16(e, 42);
-  element_give_u32(e, 3587);
-  // char data = 123;
-  // e->data = &data;
-  // e->kind = ELEMENT_I8;
-  // char redata;
-
-  char *endptr;
-
-  // redata = *(char *)e->data;
-
-  // printf("%d\n", redata);
-  printf("%d\n", element_take_i8(e));
-
-  short testa = (2000 * 34) / 100;
-  printf("%d\n", testa);
-
-  intmax_t cake = strtoimax("+1234", &endptr, 10);
-  printf("%li\n", cake);
-  */
 
   return 0;
 }

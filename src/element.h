@@ -7,11 +7,6 @@
 
 #include "util.h"
 
-//#include "bignum.h"
-//#include "list.h"
-//#include "dictionary.h"
-//#include "vm.h"
-
 typedef enum {
   /*00*/ ELEMENT_VOID,   // uninitialized
   /*01*/ ELEMENT_EMPTY,  // ready for contents
@@ -43,16 +38,6 @@ Element* newElement() {
   self->kind = ELEMENT_EMPTY;
   return self;
 }
-
-/*
-Bignum* element_get_bignum(Element* self) { return (Bignum*)self->data; }
-
-Element* element_set_bignum(Element* destination, Bignum* source) {
-  destination->data = (void*)source;
-  destination->kind = ELEMENT_BIGNUM;
-  return destination;
-}
-*/
 
 int* element_get_enum(Element* self) { return (int*)self->data; }
 

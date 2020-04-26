@@ -56,47 +56,6 @@ Element *ducktype_as_quote(const char *token, int remove_quotes) {
   return NULL;
 }
 
-/*
-// HACK
-Element *ducktype_as_bignum(const char *token, unsigned short base) {
-  size_t length = strlen(token);
-  Bignum *bn = newBignum(base);
-  bignum_resize(bn, length);
-  char cur = token[0];
-  size_t index;
-
-  unsigned char tmp_digit;
-  char *endptr = NULL;
-  char extractor[5] = {0, 0, 0, 0, 0};
-
-  for (size_t i = 0; i < length; i++) {
-    index = (length - 1) - i;
-    cur = token[index];
-    if (cur == '0') {
-      bignum_set_digit(bn, i, 0);
-    } else {
-      extractor[0] = cur;
-      tmp_digit = (unsigned char)strtoumax(extractor, &endptr, base);
-      if (tmp_digit) {
-        bignum_set_digit(bn, i, tmp_digit);
-      } else if (length > 1 && index == 0) {
-        if (cur == '-') {
-          bn->negative = 1;
-        } else if (cur == '+') {
-          bn->negative = 0;
-        } else
-          return NULL;
-      } else {
-        return NULL;
-      }
-    }
-  }
-  Element *e = newElement();
-  bignum_clean_zeroes(bn);
-  return element_set_bignum(e, bn);
-}
-*/
-
 Element *ducktype_as_number(const char *token, int base) {
   int is_signed = (token[0] == '-' || token[0] == '+');
   char *endptr;
