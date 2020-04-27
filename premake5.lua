@@ -13,14 +13,14 @@ workspace "WS_reconn"
         toolset ("mingw64")
         --entrypoint "WinMainCRTStartup"
 
-project "apireconn"
-  location "build/apireconn/"
+project "libreconn"
+  location "build/libreconn/"
   kind "SharedLib"
   language "C"
 
-  targetdir "lib/apireconn"
+  targetdir "lib/reconn"
 
-  files { "./src/apireconn/**.h", "./src/apireconn/**.c" }
+  files { "./src/_reconn/**.h", "./src/_reconn/**.c" }
 
 project "reconn"
     location "build/reconn/"
@@ -29,10 +29,10 @@ project "reconn"
     language "C"
     targetdir "bin/%{cfg.buildcfg}"
 
-    libdirs { "./lib/apireconn"}
-    includedirs { "./src/apireconn/" }
+    libdirs { "./lib/libreconn"}
+    includedirs { "./src/_reconn/" }
     --links { "allegro", "allegro_ttf", "allegro_font", "allegro_color", "allegro_primitives" }
-    links { "apireconn" }
+    links { "reconn" }
 
     files { "./src/reconn/**.h", "./src/reconn/**.c" }
 
