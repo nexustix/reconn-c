@@ -1,4 +1,4 @@
 rm -r ./build/
 rm -r ./bin/
-rm -r ./lib/apireconn
+rm -r ./lib/reconn
 rm Makefile

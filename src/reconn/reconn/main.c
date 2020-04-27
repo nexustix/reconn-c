@@ -10,8 +10,11 @@
 #include "reconn/data/list.h"
 #include "reconn/parse.h"
 //#include "test.h"
+#include "modules/core/core.h"
 #include "reconn/util.h"
 #include "reconn/vm.h"
+
+/*
 // HACK
 static char *content_root;
 
@@ -46,19 +49,6 @@ int _end_compile(ReconnVM *self) {
 
 // TODO implement
 // void _do(ReconnVM *self) {}
-
-int _println(ReconnVM *self) {
-  static ReconnElement *e;
-  if (!e) e = rcn_newReconnElement();
-  rcn_vm_pop_value(self, e);
-  // assert(e->kind == RECONN_ELEMENT_BIGNUM);
-  // printf("%s\n", bignum_to_cstring(element_get_bignum(e)));
-  assert(e->kind == RECONN_ELEMENT_CSTRING);
-  printf("%s\n", rcn_element_get_cstring(e));
-  // FIXME investigate if contained string get's freed
-  free(e);
-  return 0;
-}
 
 // FIXME values are no longer just bignums
 
@@ -186,21 +176,33 @@ int _use(ReconnVM *self) {
   }
   return 0;
 }
+*/
+
+int _println(ReconnVM *self) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
+  rcn_vm_pop_value(self, e);
+  // assert(e->kind == RECONN_ELEMENT_CSTRING);
+  // printf("%s\n", rcn_element_get_cstring(e));
+  printf("%s\n", rcn_element_data_to_cstring(e));
+  free(e);
+  return 0;
+}
 
 void register_words(ReconnVM *vm) {
-  rcn_vm_add_primary(vm, "def", _def);
-  rcn_vm_add_compile(vm, "def", _def_compile);
-  rcn_vm_add_compile(vm, "end", _end_compile);
+  // rcn_vm_add_primary(vm, "def", _def);
+  // rcn_vm_add_compile(vm, "def", _def_compile);
+  // rcn_vm_add_compile(vm, "end", _end_compile);
 
   rcn_vm_add_primary(vm, "println", _println);
-  rcn_vm_add_primary(vm, "s", _print_value_stack);
+  // rcn_vm_add_primary(vm, "s", _print_value_stack);
 
-  rcn_vm_add_primary(vm, "#namespace", _print_namespace);
-  rcn_vm_add_primary(vm, "#enter", _enter);
-  rcn_vm_add_primary(vm, "#leave", _leave);
+  // rcn_vm_add_primary(vm, "#namespace", _print_namespace);
+  // rcn_vm_add_primary(vm, "#enter", _enter);
+  // rcn_vm_add_primary(vm, "#leave", _leave);
 
-  rcn_vm_add_primary(vm, "#include", _include);
-  rcn_vm_add_primary(vm, "#use", _use);
+  // rcn_vm_add_primary(vm, "#include", _include);
+  // rcn_vm_add_primary(vm, "#use", _use);
 }
 
 int main(int argc, const char *argv[]) {
@@ -212,12 +214,12 @@ int main(int argc, const char *argv[]) {
   // bake_cake("strawberry");
 
   // char *content_root = getenv("RCNPATH");
-  content_root = getenv("RCNPATH");
+  core_content_root = getenv("RCNPATH");
 
-  if (!content_root) {
+  if (!core_content_root) {
     // FIXME questionable constant
-    content_root = malloc(4096);
-    getcwd(content_root, 4096);
+    core_content_root = malloc(4096);
+    getcwd(core_content_root, 4096);
   }
 
   ReconnVM *vm = rcn_newReconnVM();
@@ -247,7 +249,7 @@ int main(int argc, const char *argv[]) {
   } else {
     fprintf(stderr, "Reconn REPL\n");
     fprintf(stderr, "Version: INDEV\n");
-    fprintf(stderr, "RCNPATH: >%s<\n", content_root);
+    fprintf(stderr, "RCNPATH: >%s<\n", core_content_root);
     while (1) {
       getline(&data, &size, stdin);
       rcn_parse_tokens(data, tokens);
