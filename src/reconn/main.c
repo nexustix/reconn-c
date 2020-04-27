@@ -7,7 +7,7 @@
 #include "element.h"
 #include "list.h"
 #include "parse.h"
-#include "test.h"
+//#include "test.h"
 #include "util.h"
 #include "vm.h"
 // HACK
@@ -206,7 +206,7 @@ int main(int argc, const char *argv[]) {
   char *data = malloc(1024);
   size_t tbd;
 
-  bake_cake("strawberry");
+  // bake_cake("strawberry");
 
   // char *content_root = getenv("RCNPATH");
   content_root = getenv("RCNPATH");
