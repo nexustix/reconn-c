@@ -1,58 +1,60 @@
+
 #include <assert.h>
 //#include <reconnapi.h>
+#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 
-#include "dictionary.h"
-#include "element.h"
-#include "list.h"
-#include "parse.h"
+#include "reconn/data/dictionary.h"
+#include "reconn/data/element.h"
+#include "reconn/data/list.h"
+#include "reconn/parse.h"
 //#include "test.h"
-#include "util.h"
-#include "vm.h"
+#include "reconn/util.h"
+#include "reconn/vm.h"
 // HACK
 static char *content_root;
 
-int _def(VM *self) {
-  vm_push_state(self, STATE_COMPILE);
+int _def(ReconnVM *self) {
+  rcn_vm_push_state(self, RECONN_STATE_COMPILE);
   return 0;
 }
 
-int _def_compile(VM *self) {
-  vm_push_state(self, STATE_HARD);
-  vm_push_wordbuffer(self, TOKEN_DEF);
+int _def_compile(ReconnVM *self) {
+  rcn_vm_push_state(self, RECONN_STATE_HARD);
+  rcn_vm_push_wordbuffer(self, TOKEN_DEF);
   return 0;
 }
 
-int _end_compile(VM *self) {
-  static Element *e;
-  if (!e) e = newElement();
+int _end_compile(ReconnVM *self) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
 
-  List *new_word = newList(2);
+  ReconnList *new_word = rcn_newReconnList(2);
   for (unsigned long i = 2; i <= self->word_buffer->top; i++) {
-    e = list_get_at(self->word_buffer, i);
-    assert(e->kind == ELEMENT_CSTRING);
-    list_push(new_word, e);
+    e = rcn_list_get_at(self->word_buffer, i);
+    assert(e->kind == RECONN_ELEMENT_CSTRING);
+    rcn_list_push(new_word, e);
   }
-  e = list_get_at(self->word_buffer, 1);
+  e = rcn_list_get_at(self->word_buffer, 1);
   // printf("new word called >%s<\n", element_get_cstring(e));
-  vm_add_secondary(self, element_get_cstring(e), new_word);
-  vm_pop_state(self);
+  rcn_vm_add_secondary(self, rcn_element_get_cstring(e), new_word);
+  rcn_vm_pop_state(self);
   self->word_buffer->top = 0;
   return 0;
 }
 
 // TODO implement
-// void _do(VM *self) {}
+// void _do(ReconnVM *self) {}
 
-int _println(VM *self) {
-  static Element *e;
-  if (!e) e = newElement();
-  vm_pop_value(self, e);
-  // assert(e->kind == ELEMENT_BIGNUM);
+int _println(ReconnVM *self) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
+  rcn_vm_pop_value(self, e);
+  // assert(e->kind == RECONN_ELEMENT_BIGNUM);
   // printf("%s\n", bignum_to_cstring(element_get_bignum(e)));
-  assert(e->kind == ELEMENT_CSTRING);
-  printf("%s\n", element_get_cstring(e));
+  assert(e->kind == RECONN_ELEMENT_CSTRING);
+  printf("%s\n", rcn_element_get_cstring(e));
   // FIXME investigate if contained string get's freed
   free(e);
   return 0;
@@ -60,10 +62,10 @@ int _println(VM *self) {
 
 // FIXME values are no longer just bignums
 
-int _print_value_stack(VM *self) {
-  static Element *e;
-  if (!e) e = newElement();
-  // Element *e;
+int _print_value_stack(ReconnVM *self) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
+  // ReconnElement *e;
   unsigned long index = 0;
   // printf(" | ");
   printf(" ");
@@ -72,46 +74,47 @@ int _print_value_stack(VM *self) {
     // printf("[%s] ", bignum_to_cstring(
     //                    element_get_bignum(list_get_at(self->value_stack,
     //                    i))));
-    e = list_get_at(self->value_stack, index);
+    e = rcn_list_get_at(self->value_stack, index);
     // printf("(%d)[%s] ", e->kind, element_to_cstring(e));
-    printf("(%s)[%s] ", element_kind_to_cstring(e), element_data_to_cstring(e));
+    printf("(%s)[%s] ", rcn_element_kind_to_cstring(e),
+           rcn_element_data_to_cstring(e));
   }
   // printf("|>");
   printf("\n");
   return 0;
 }
 
-int _print_namespace(VM *self) {
-  printf(">%s<\n", vm_namespace(self));
+int _print_namespace(ReconnVM *self) {
+  printf(">%s<\n", rcn_vm_namespace(self));
   return 0;
 }
 
-int _enter(VM *self) {
-  static Element *e;
-  if (!e) e = newElement();
-  vm_pop_value(self, e);
-  // assert(e->kind == ELEMENT_BIGNUM);
+int _enter(ReconnVM *self) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
+  rcn_vm_pop_value(self, e);
+  // assert(e->kind == RECONN_ELEMENT_BIGNUM);
   // vm_push_namespace(self, bignum_to_cstring(element_get_bignum(e)));
-  assert(e->kind == ELEMENT_CSTRING);
-  vm_push_namespace(self, element_get_cstring(e));
+  assert(e->kind == RECONN_ELEMENT_CSTRING);
+  rcn_vm_push_namespace(self, rcn_element_get_cstring(e));
   return 0;
 }
 
-int _leave(VM *self) {
-  vm_pop_namespace(self);
+int _leave(ReconnVM *self) {
+  rcn_vm_pop_namespace(self);
   return 0;
 }
 
 // HACK
-int _include(VM *self) {
-  static Element *e;
-  if (!e) e = newElement();
+int _include(ReconnVM *self) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
 
-  vm_pop_value(self, e);
-  // assert(e->kind == ELEMENT_BIGNUM);
+  rcn_vm_pop_value(self, e);
+  // assert(e->kind == RECONN_ELEMENT_BIGNUM);
   // const char *sub_path = bignum_to_cstring(element_get_bignum(e));
-  assert(e->kind == ELEMENT_CSTRING);
-  const char *sub_path = element_get_cstring(e);
+  assert(e->kind == RECONN_ELEMENT_CSTRING);
+  const char *sub_path = rcn_element_get_cstring(e);
 
   size_t content_root_length = strlen(content_root);
   size_t sub_path_length = strlen(content_root);
@@ -124,7 +127,7 @@ int _include(VM *self) {
   strcat(complete_path, sub_path);
   strcat(complete_path, ".rcn");
 
-  List *tokens = newList(16);
+  ReconnList *tokens = rcn_newReconnList(16);
   FILE *handle = NULL;
   size_t size;
   char *data = malloc(1024);
@@ -145,8 +148,8 @@ int _include(VM *self) {
           continue;
         }
       }
-      parse_tokens(data, tokens);
-      vm_execute_all(self, tokens, 0);
+      rcn_parse_tokens(data, tokens);
+      rcn_vm_execute_all(self, tokens, 0);
       tokens->top = 0;
     }
     fclose(handle);
@@ -154,15 +157,15 @@ int _include(VM *self) {
   return 0;
 }
 
-int _use(VM *self) {
-  static Element *e;
-  if (!e) e = newElement();
+int _use(ReconnVM *self) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
 
-  vm_pop_value(self, e);
-  // assert(e->kind == ELEMENT_BIGNUM);
+  rcn_vm_pop_value(self, e);
+  // assert(e->kind == RECONN_ELEMENT_BIGNUM);
   // const char *use_name = bignum_to_cstring(element_get_bignum(e));
-  assert(e->kind == ELEMENT_CSTRING);
-  const char *use_name = element_get_cstring(e);
+  assert(e->kind == RECONN_ELEMENT_CSTRING);
+  const char *use_name = rcn_element_get_cstring(e);
 
   // if (use_name == "io") {
   if (0) {
@@ -184,24 +187,24 @@ int _use(VM *self) {
   return 0;
 }
 
-void register_words(VM *vm) {
-  vm_add_primary(vm, "def", _def);
-  vm_add_compile(vm, "def", _def_compile);
-  vm_add_compile(vm, "end", _end_compile);
+void register_words(ReconnVM *vm) {
+  rcn_vm_add_primary(vm, "def", _def);
+  rcn_vm_add_compile(vm, "def", _def_compile);
+  rcn_vm_add_compile(vm, "end", _end_compile);
 
-  vm_add_primary(vm, "println", _println);
-  vm_add_primary(vm, "s", _print_value_stack);
+  rcn_vm_add_primary(vm, "println", _println);
+  rcn_vm_add_primary(vm, "s", _print_value_stack);
 
-  vm_add_primary(vm, "namespace", _print_namespace);
-  vm_add_primary(vm, "#enter", _enter);
-  vm_add_primary(vm, "#leave", _leave);
+  rcn_vm_add_primary(vm, "#namespace", _print_namespace);
+  rcn_vm_add_primary(vm, "#enter", _enter);
+  rcn_vm_add_primary(vm, "#leave", _leave);
 
-  vm_add_primary(vm, "#include", _include);
-  vm_add_primary(vm, "#use", _use);
+  rcn_vm_add_primary(vm, "#include", _include);
+  rcn_vm_add_primary(vm, "#use", _use);
 }
 
 int main(int argc, const char *argv[]) {
-  List *tokens = newList(16);
+  ReconnList *tokens = rcn_newReconnList(16);
   size_t size;
   char *data = malloc(1024);
   size_t tbd;
@@ -217,7 +220,7 @@ int main(int argc, const char *argv[]) {
     getcwd(content_root, 4096);
   }
 
-  VM *vm = newVM();
+  ReconnVM *vm = rcn_newReconnVM();
   register_words(vm);
 
   FILE *handle = NULL;
@@ -236,8 +239,8 @@ int main(int argc, const char *argv[]) {
           continue;
         }
       }
-      parse_tokens(data, tokens);
-      vm_execute_all(vm, tokens, 0);
+      rcn_parse_tokens(data, tokens);
+      rcn_vm_execute_all(vm, tokens, 0);
       tokens->top = 0;
     }
     fclose(handle);
@@ -247,8 +250,8 @@ int main(int argc, const char *argv[]) {
     fprintf(stderr, "RCNPATH: >%s<\n", content_root);
     while (1) {
       getline(&data, &size, stdin);
-      parse_tokens(data, tokens);
-      vm_execute_all(vm, tokens, 1);
+      rcn_parse_tokens(data, tokens);
+      rcn_vm_execute_all(vm, tokens, 1);
       tokens->top = 0;
     }
   }

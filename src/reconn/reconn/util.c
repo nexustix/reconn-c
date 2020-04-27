@@ -1,22 +1,17 @@
-#ifndef UTIL_H
-#define UTIL_H
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "reconn/util.h"
 
 // harmless info
-void info(char* message) { fprintf(stderr, "<-> %s\n", message); }
+void rcn_info(char* message) { fprintf(stderr, "<-> %s\n", message); }
 
 // cautionary warning
-void warn(int test, char* message) {
+void rcn_warn(int test, char* message) {
   if (!test) {
     fprintf(stderr, "<!> WARN %s\n", message);
   }
 }
 
 // fatal error
-void error(int test, char* message) {
+void rcn_error(int test, char* message) {
   if (!test) {
     fprintf(stderr, "<!> FATAL %s\n", message);
     exit(1);
@@ -24,7 +19,7 @@ void error(int test, char* message) {
 }
 
 // lobs last element of string by turning separator to 0
-void seplob(char* cstring, char sep) {
+void rcn_seplob(char* cstring, char sep) {
   char* cut = strrchr(cstring, sep);
   if (cut) {
     cut[0] = 0;
@@ -32,5 +27,3 @@ void seplob(char* cstring, char sep) {
     cstring[0] = 0;
   }
 }
-
-#endif

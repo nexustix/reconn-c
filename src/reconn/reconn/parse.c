@@ -1,20 +1,9 @@
-#ifndef PARSE_H
-#define PARSE_H
+#include "reconn/parse.h"
 
-#define QUOTE_CHAR '"'
-
-#include <ctype.h>
-//#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "element.h"
-#include "list.h"
-#include "util.h"
-
-unsigned int parse_string(char *data, unsigned int offset, List *tokens) {
-  static Element *e;
-  if (!e) e = newElement();
+unsigned int rcn_parse_string(char *data, unsigned int offset,
+                              ReconnList *tokens) {
+  static ReconnElement *e;
+  if (!e) e = rcn_newReconnElement();
   int quote_found = 0;
   unsigned int counter = 1;
   unsigned int max_length = strlen(data) - offset;
@@ -32,7 +21,7 @@ unsigned int parse_string(char *data, unsigned int offset, List *tokens) {
     } else {
       if (quote_found) {
         buffer[counter] = QUOTE_CHAR;
-        list_push(tokens, element_set_cstring(e, buffer));
+        rcn_list_push(tokens, rcn_element_set_cstring(e, buffer));
         return i;
       }
       buffer[counter] = cur;
@@ -43,7 +32,7 @@ unsigned int parse_string(char *data, unsigned int offset, List *tokens) {
   return 0;
 }
 
-void parse_tokens(char *data, List *tokens) {
+void rcn_parse_tokens(char *data, ReconnList *tokens) {
   int inside_token = 0;
   unsigned int offset = 0;
   unsigned int size = 0;
@@ -52,8 +41,8 @@ void parse_tokens(char *data, List *tokens) {
   char *buffer;
 
   for (unsigned int i = 0; i <= length; i++) {
-    static Element *e;
-    if (!e) e = newElement();
+    static ReconnElement *e;
+    if (!e) e = rcn_newReconnElement();
 
     cur = data[i];
     if (isspace(cur) || !cur) {
@@ -62,7 +51,7 @@ void parse_tokens(char *data, List *tokens) {
         // flush token
         buffer = (char *)calloc(size + 1, 1);
         strncpy(buffer, data + offset, size);
-        list_push(tokens, element_set_cstring(e, buffer));
+        rcn_list_push(tokens, rcn_element_set_cstring(e, buffer));
         offset = i;
       } else {
         offset++;
@@ -72,7 +61,7 @@ void parse_tokens(char *data, List *tokens) {
       if (inside_token) {
         size++;
       } else if (cur == QUOTE_CHAR) {
-        size = parse_string(data, i, tokens);
+        size = rcn_parse_string(data, i, tokens);
 
         i += size;
         offset += size;
@@ -88,5 +77,3 @@ void parse_tokens(char *data, List *tokens) {
     }
   }
 }
-
-#endif
