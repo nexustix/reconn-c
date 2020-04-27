@@ -2,7 +2,7 @@
 
 This is a draft for potential words, items marked with `?` are on shaky ground and might be removed from this draft
 
-stack effect notations are in format `( top second third ... nth -- top second third ... nth)` where "top" is the top of the stack, "second" is the second element on the stack, "third" is the third, etc.
+Stack effect notations are in format `( top second third ... nth -- top second third ... nth )` where "top" is the top of the stack, "second" is the second element on the stack, "third" is the third, etc.. The elements inside of the stack effect declarations are formatted like `name:type`, where "name" is the name of the value and "type" the type. The elements are seperated by whitespace. Seperated by `--` the left side of the declaration represents the state of the stack before execution of the word, and the right side the state of the stack after execution of said word.
 
 ## core
 
@@ -22,13 +22,13 @@ revert to namespace before last #enter
 ### #namespace ( -- :string ) 
 get complete namespace
 
-###  #plugin ( :string :string -- success:int )
-prepare plugin with given name and add it as internal module
-###  #use ( module:string -- )
+### #plugin ( external_name:string internal_name:string -- success:int )
+prepare plugin with given name and enable use as primary module
+### #use ( module:string -- )
 use primary module
-###  #useonly ( module:string word:string -- )
+### #useonly ( module:string word:string -- )
 use single word from primary module
-###  #include ( :string -- ) 
+### #include ( :string -- ) 
 include code from user module
 
 ### #words ( -- )
@@ -38,7 +38,7 @@ print current value stack
 ### #top ( -- )
 print top element of stack
 
-### #quote ( -- ) 
+### #quote ( -- ) SPECIAL
 put string name of next word on stack
 ### #do ( name:string -- ) 
 execute word the given name refers to

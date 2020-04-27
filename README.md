@@ -14,10 +14,12 @@
   - Be easy to write on line editors such as "ed"
   - Be reasonably easy on the eyes, trying to use as little punctuation or special characters in the syntax as reasonable
   - Be a testbed to evaluate stack-based languages for certain use cases
+  - Be modular
+  - Allow easy code reuse
   - Attempt to make the language usable for writing games and graphical applications
-  - Attempt to use the language to generate code for other languages/formats (like: ASM, C, XML, SVG, ABC, MIDI, BMP and WAV)
+  - Attempt to use the language to generate code for other languages/formats (like: ASM, C, XML, ABC, MIDI, BMP and WAV)
 
 ## Why that name ?
-  I was unable to come up with a reasonable name and chose "Reconn" as a WIP name and it stuck (for now)
+  I was unable to come up with a reasonable name and chose "Reconn" as a WIP name, and it stuck (for now)
 
   It was chosen as a combination of the word "Reconnect" (because i want to use it to reconnect to a low-level of programming and file formats that are hard or annoying to write by hand) and "Recon" (because i want to use it to survey and evaluate stack-based languages)
