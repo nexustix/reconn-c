@@ -110,7 +110,7 @@ const char* rcn_vm_spacename(ReconnVM* self, const char* token) {
   char* namespace = rcn_vm_namespace(self);
   size_t namespace_length = strlen(namespace);
   size_t token_length = strlen(token);
-  char* spacename = calloc(token_length + namespace_length + 1, 1);
+  char* spacename = calloc(token_length + namespace_length + 4, 1);
 
   if (namespace[0]) {
     strcpy(spacename, namespace);
@@ -176,11 +176,21 @@ ReconnElement* rcn_vm_pop_value(ReconnVM* self, ReconnElement* value) {
   return rcn_list_pop(self->value_stack, value);
 }
 
+void rcn_vm_push_run(ReconnVM* self, ReconnElement* value) {
+  rcn_error(value->kind == RECONN_ELEMENT_CSTRING,
+            "tried to push non-string value onto run stack");
+  rcn_list_push(self->run_stack, value);
+}
+
+ReconnElement* rcn_vm_pop_run(ReconnVM* self, ReconnElement* value) {
+  return rcn_list_pop(self->run_stack, value);
+}
+
 ReconnElement* rcn_vm_find_word(ReconnVM* self, const char* token) {
   char* namespace = rcn_vm_namespace(self);
   size_t namespace_length = strlen(namespace);
   size_t token_length = strlen(token);
-  char* wordname = calloc(namespace_length + token_length + 1, 1);
+  char* wordname = calloc(namespace_length + token_length + 2, 1);
   ReconnElement* result;
 
   // HACK
@@ -226,18 +236,13 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
       // fprintf(stderr, " - inside NORMAL\n");
       e = rcn_vm_find_word(self, token);
       if (e) {
-        // if (dictionary_has_key(self->dictionaries[RECONN_STATE_NORMAL],
-        // token)) {
-        //  e = dictionary_get(self->dictionaries[RECONN_STATE_NORMAL], token);
         if (e->kind == RECONN_ELEMENT_WORD_PRIMARY) {
-          // fprintf(stderr, " - found prime\n");
           rcn_element_get_pword(e)(self);
+          // TODO use run stack push and pop functions instead of ad-hoc
         } else if (e->kind == RECONN_ELEMENT_WORD_SECONDARY) {
-          // fprintf(stderr, " - found secondary\n");
           ReconnList* words = rcn_element_get_sword(e);
           for (unsigned long i = 0; i < words->top; i++) {
             e = rcn_list_get_at(words, words->top - i);
-            // assert(e->kind == RECONN_ELEMENT_CSTRING);
             rcn_error(e->kind == RECONN_ELEMENT_CSTRING,
                       "non-cstring in secondary word");
             rcn_list_push(self->run_stack, e);

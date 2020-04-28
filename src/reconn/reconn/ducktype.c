@@ -2,21 +2,25 @@
 
 ReconnElement *rcn_ducktype_as_string(const char *token, int remove_quotes) {
   unsigned long length = strlen(token);
-  char *result = (char *)malloc(length);
+  char *result = (char *)calloc(length + 1, 1);
   // printf(">%c< >%c<\n", token[0], token[length - 1]);
   if ((length >= 2) && (token[0] == '"' && '"' == token[length - 1])) {
     ReconnElement *e = rcn_newReconnElement();
     if (remove_quotes) {
       if (length == 2) {
+        // FIXME pointer might get invalidated
         rcn_element_set_cstring(e, "");
       } else {
         // char *result = (char *)malloc(length - 2);
         strncpy(result, token + 1, length - 2);
+        result[length] = 0;
+        // printf("A >%lu< >%s<\n", length, result);
         rcn_element_set_cstring(e, result);
         return e;
       }
     } else {
       strncpy(result, token, length);
+      // printf("B >%s<\n", result);
       rcn_element_set_cstring(e, result);
       return e;
     }
@@ -26,7 +30,7 @@ ReconnElement *rcn_ducktype_as_string(const char *token, int remove_quotes) {
 
 ReconnElement *rcn_ducktype_as_quote(const char *token, int remove_quotes) {
   unsigned long length = strlen(token);
-  char *result = (char *)calloc(length, 1);
+  char *result = (char *)calloc(length + 1, 1);
 
   if (length >= 1 && token[0] == ':') {
     ReconnElement *e = rcn_newReconnElement();
@@ -36,11 +40,13 @@ ReconnElement *rcn_ducktype_as_quote(const char *token, int remove_quotes) {
         return e;
       } else {
         strncpy(result, token + 1, length + 2);
+        // printf("C %s<\n", result);
         rcn_element_set_cstring(e, result);
         return e;
       }
     } else {
       strncpy(result, token, length);
+      // printf("D >%s<\n", result);
       rcn_element_set_cstring(e, result);
       return e;
     }
@@ -55,11 +61,15 @@ ReconnElement *rcn_ducktype_as_number(const char *token, int base) {
   // handle number being 0
   if (strcmp(token, "0") == 0) {
     ReconnElement *e = rcn_newReconnElement();
-    // element_give_u8(e, 0);
+    unsigned char *v = calloc(1, sizeof(unsigned char));
+    *v = 0;
+    rcn_element_set_u8(e, v);
     return e;
   } else if ((strcmp(token, "+0") == 0) || (strcmp(token, "-0") == 0)) {
     ReconnElement *e = rcn_newReconnElement();
-    // element_give_i8(e, 0);
+    char *v = calloc(1, sizeof(char));
+    *v = 0;
+    rcn_element_set_i8(e, v);
     return e;
   }
 

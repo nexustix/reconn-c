@@ -279,7 +279,7 @@ const char* rcn_element_data_to_cstring(ReconnElement* self) {
       break;
 
     default:
-      rcn_error(0, "can't turn element value into string");
+      // rcn_error(0, "can't turn element value into string");
       break;
   }
   return "N/A";
@@ -342,4 +342,53 @@ int rcn_element_is_unsigned_integer(ReconnElement* self) {
       return 0;
       break;
   }
+}
+
+int rcn_element_is_integer(ReconnElement* self) {
+  switch (self->kind) {
+    case RECONN_ELEMENT_I8:
+    case RECONN_ELEMENT_I16:
+    case RECONN_ELEMENT_I32:
+    case RECONN_ELEMENT_U8:
+    case RECONN_ELEMENT_U16:
+    case RECONN_ELEMENT_U32:
+      return 1;
+      break;
+
+    default:
+      return 0;
+      break;
+  }
+}
+
+int rcn_element_to_boolean(ReconnElement* self) {
+  switch (self->kind) {
+    case RECONN_ELEMENT_CSTRING:
+      return strcmp((char*)self->data, "") != 0;
+      break;
+
+    case RECONN_ELEMENT_I8:
+      return *(char*)self->data != 0;
+      break;
+    case RECONN_ELEMENT_I16:
+      return *(short*)self->data != 0;
+      break;
+    case RECONN_ELEMENT_I32:
+      return *(long*)self->data != 0;
+      break;
+    case RECONN_ELEMENT_U8:
+      return *(unsigned char*)self->data != 0;
+      break;
+    case RECONN_ELEMENT_U16:
+      return *(unsigned short*)self->data != 0;
+      break;
+    case RECONN_ELEMENT_U32:
+      return *(unsigned long*)self->data != 0;
+      break;
+
+    default:
+      rcn_error(0, "unable to convert element to boolean");
+      break;
+  }
+  return 1;
 }

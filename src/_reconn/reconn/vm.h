@@ -81,6 +81,9 @@ const char* rcn_vm_pop_wordbuffer(ReconnVM* self);
 void rcn_vm_push_value(ReconnVM* self, ReconnElement* value);
 ReconnElement* rcn_vm_pop_value(ReconnVM* self, ReconnElement* value);
 
+void rcn_vm_push_run(ReconnVM* self, ReconnElement* value);
+ReconnElement* rcn_vm_pop_run(ReconnVM* self, ReconnElement* value);
+
 ReconnElement* rcn_vm_find_word(ReconnVM* self, const char* token);
 
 int rcn_vm_do(ReconnVM* self, const char* token);

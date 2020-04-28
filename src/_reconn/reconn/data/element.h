@@ -34,11 +34,13 @@ ReconnElement* rcn_newReconnElement();
 
 const char* rcn_element_data_to_cstring(ReconnElement* self);
 const char* rcn_element_kind_to_cstring(ReconnElement* self);
+int rcn_element_to_boolean(ReconnElement* self);
 
 /*functions for testing data types*/
 
 int rcn_element_is_signed_integer(ReconnElement* self);
 int rcn_element_is_unsigned_integer(ReconnElement* self);
+int rcn_element_is_integer(ReconnElement* self);
 
 /* function for getting/setting various types */
 

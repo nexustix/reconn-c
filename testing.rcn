@@ -1,7 +1,19 @@
+#!
+
+:io #use
+:flow #use
 
 def main
   "hello" println
   "this code is inside a file" println
 end
 
-main
+
+
+def yes 
+  "YES" println
+end
+
+def no
+  "NO" println
+end

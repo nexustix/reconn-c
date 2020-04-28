@@ -14,6 +14,7 @@
 #include "reconn/util.h"
 #include "reconn/vm.h"
 
+/*
 int _println(ReconnVM *self) {
   static ReconnElement *e;
   if (!e) e = rcn_newReconnElement();
@@ -22,9 +23,11 @@ int _println(ReconnVM *self) {
   free(e);
   return 0;
 }
+*/
 
 void register_words(ReconnVM *vm) {
-  rcn_vm_add_primary(vm, "println", _println);
+  // rcn_vm_add_primary(vm, "println", _println);
+  core_register_all(vm);
 }
 
 int main(int argc, const char *argv[]) {
@@ -72,11 +75,13 @@ int main(int argc, const char *argv[]) {
     fprintf(stderr, "Reconn REPL\n");
     fprintf(stderr, "Version: INDEV\n");
     fprintf(stderr, "RCNPATH: >%s<\n", core_content_root);
+    fprintf(stderr, ">");
     while (1) {
       getline(&data, &size, stdin);
       rcn_parse_tokens(data, tokens);
       rcn_vm_execute_all(vm, tokens, 1);
       tokens->top = 0;
+      fprintf(stderr, ">");
     }
   }
 

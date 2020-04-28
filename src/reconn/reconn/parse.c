@@ -8,7 +8,7 @@ unsigned int rcn_parse_string(char *data, unsigned int offset,
   unsigned int counter = 1;
   unsigned int max_length = strlen(data) - offset;
   unsigned char cur;
-  char *buffer = (char *)calloc(max_length, 1);
+  char *buffer = (char *)calloc(max_length + 2, 1);
   buffer[0] = QUOTE_CHAR;
   for (unsigned int i = 1; i < max_length; i++) {
     cur = data[offset + i];
@@ -49,7 +49,7 @@ void rcn_parse_tokens(char *data, ReconnList *tokens) {
       if (inside_token) {
         size++;
         // flush token
-        buffer = (char *)calloc(size + 1, 1);
+        buffer = (char *)calloc(size + 2, 1);
         strncpy(buffer, data + offset, size);
         rcn_list_push(tokens, rcn_element_set_cstring(e, buffer));
         offset = i;
