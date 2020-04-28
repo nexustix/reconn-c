@@ -7,6 +7,7 @@ static char* core_content_root;
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../arithmetic/arithmetic.h"
 #include "../flow/flow.h"
 #include "../io/io.h"
 #include "reconn/parse.h"
@@ -103,6 +104,7 @@ int core_word_use(ReconnVM* vm) {
     flow_register_all(vm);
   } else if (strcmp(use_name, "arithmetic") == 0) {
     // voc_mat_register_words(self);
+    arithmetic_register_all(vm);
   } else if (strcmp(use_name, "file") == 0) {
     // } else if (strcmp(use_name, "") == 0) {
 

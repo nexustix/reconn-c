@@ -1,6 +1,7 @@
 #ifndef RECONN_DATA_ELEMENT_H
 #define RECONN_DATA_ELEMENT_H
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,6 +36,9 @@ ReconnElement* rcn_newReconnElement();
 const char* rcn_element_data_to_cstring(ReconnElement* self);
 const char* rcn_element_kind_to_cstring(ReconnElement* self);
 int rcn_element_to_boolean(ReconnElement* self);
+
+// uintmax_t rcn_element_to_uintmax(ReconnElement* self);
+// intmax_t rcn_element_to_intmax(ReconnElement* self);
 
 /*functions for testing data types*/
 

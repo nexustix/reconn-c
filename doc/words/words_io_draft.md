@@ -10,7 +10,7 @@ write single octet to stdout
 ### ? cr ( -- )
 ### ? lf ( -- )
 
-### print( :string -- )
+### ✓ print( :string -- )
 write octets of string to stdout
 ### eprint( :string -- )
 write octets of string to stderr
@@ -19,7 +19,7 @@ write octets of string to stdout, adding newline
 ### eprintln( :string -- )
 write octets of string to stderr, adding newline
 
-### flush( -- )
+### ✓ flush( -- )
 flush stdout buffer
 ### eflush ( -- )
 flush stderr buffer

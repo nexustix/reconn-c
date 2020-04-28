@@ -1,0 +1,11 @@
+#ifndef RECONN_ERROR_H
+#define RECONN_ERROR_H
+
+typedef enum ReconnError {
+  RECONN_ERROR_SUCCESS,
+  RECONN_ERROR_NOT_IMPLEMENTED,
+  RECONN_ERROR_RESTORED,
+  RECONN_ERROR_FATAL,
+} ReconnError;
+
+#endif

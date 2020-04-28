@@ -392,3 +392,72 @@ int rcn_element_to_boolean(ReconnElement* self) {
   }
   return 1;
 }
+/*
+uintmax_t rcn_element_to_uintmax(ReconnElement* self) {
+  uintmax_t tmp_value = 0;
+  switch (self->kind) {
+    case RECONN_ELEMENT_I8:
+      printf("a\n");
+      tmp_value = (uintmax_t) * (char*)self->kind;
+      printf("b\n");
+      break;
+    case RECONN_ELEMENT_I16:
+      printf("c\n");
+      tmp_value = (uintmax_t) * (short*)self->kind;
+      break;
+    case RECONN_ELEMENT_I32:
+      printf("d\n");
+      tmp_value = (uintmax_t) * (long*)self->kind;
+      break;
+    case RECONN_ELEMENT_U8:
+      printf("e\n");
+      tmp_value = *(unsigned char*)self->kind;
+      printf("e2\n");
+      break;
+    case RECONN_ELEMENT_U16:
+      printf("f\n");
+      tmp_value = (uintmax_t) * (unsigned short*)self->kind;
+      break;
+    case RECONN_ELEMENT_U32:
+      printf("g\n");
+      tmp_value = (uintmax_t) * (unsigned long*)self->kind;
+      break;
+
+    default:
+      rcn_error(0, "can't turn element into uintmax");
+      break;
+  }
+  return tmp_value;
+}
+
+intmax_t rcn_element_to_intmax(ReconnElement* self) {
+  intmax_t tmp_value = 0;
+  switch (self->kind) {
+    break;
+
+    case RECONN_ELEMENT_I8:
+      tmp_value = (intmax_t) * (char*)self->kind;
+      break;
+    case RECONN_ELEMENT_I16:
+      tmp_value = (intmax_t) * (short*)self->kind;
+      break;
+    case RECONN_ELEMENT_I32:
+      tmp_value = (intmax_t) * (long*)self->kind;
+      break;
+    case RECONN_ELEMENT_U8:
+      tmp_value = (intmax_t) * (unsigned char*)self->kind;
+      break;
+    case RECONN_ELEMENT_U16:
+      tmp_value = (intmax_t) * (unsigned short*)self->kind;
+      break;
+    case RECONN_ELEMENT_U32:
+      tmp_value = (intmax_t) * (unsigned long*)self->kind;
+      break;
+
+    default:
+      rcn_error(0, "can't turn element into intmax");
+      break;
+  }
+  return tmp_value;
+}
+*/

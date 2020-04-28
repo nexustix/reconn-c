@@ -1,0 +1,16 @@
+:io #use
+:flow #use
+
+def yes 
+  "YES" println
+end
+
+def no
+  "NO" println
+end
+
+0 :yes :no if
+1 :yes :no if
+
+0 :yes when
+1 :yes when

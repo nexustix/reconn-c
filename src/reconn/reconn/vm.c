@@ -221,12 +221,14 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
 
   // fprintf(stderr, " - do >%s< inside >%d<\n", token, (int)vm_state(self));
 
-  if (strcmp("(", token) == 0)
+  if (strcmp("(", token) == 0) {
     self->comment++;
-  else if (strcmp(")", token) == 0) {
+    return 0;
+  } else if (strcmp(")", token) == 0) {
     self->comment--;
     // assert(self->comment >= 0);
     rcn_error(self->comment >= 0, "unbalanced comments");
+    return 0;
   }
   if (self->comment) return 0;
 
