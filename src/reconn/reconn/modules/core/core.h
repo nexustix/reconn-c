@@ -10,6 +10,7 @@ static char* core_content_root;
 #include "../arithmetic/arithmetic.h"
 #include "../flow/flow.h"
 #include "../io/io.h"
+#include "../var/var.h"
 #include "reconn/parse.h"
 #include "reconn/vm.h"
 
@@ -96,23 +97,24 @@ int core_word_use(ReconnVM* vm) {
   if (0) {
   } else if (strcmp(use_name, "io") == 0) {
     io_register_all(vm);
-  } else if (strcmp(use_name, "string") == 0) {
-  } else if (strcmp(use_name, "memory") == 0) {
-  } else if (strcmp(use_name, "stack") == 0) {
-  } else if (strcmp(use_name, "logic") == 0) {
+    //} else if (strcmp(use_name, "string") == 0) {
+    //} else if (strcmp(use_name, "memory") == 0) {
+    //} else if (strcmp(use_name, "stack") == 0) {
+    //} else if (strcmp(use_name, "logic") == 0) {
+  } else if (strcmp(use_name, "var") == 0) {
+    var_register_all(vm);
   } else if (strcmp(use_name, "flow") == 0) {
     flow_register_all(vm);
   } else if (strcmp(use_name, "arithmetic") == 0) {
-    // voc_mat_register_words(self);
     arithmetic_register_all(vm);
-  } else if (strcmp(use_name, "file") == 0) {
+    //} else if (strcmp(use_name, "file") == 0) {
     // } else if (strcmp(use_name, "") == 0) {
 
   } else {
     fprintf(stderr, "<!> unable to find core module >%s<\n", use_name);
     exit(1);
   }
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
 int core_word_useonly(ReconnVM* vm) { return 1; }
@@ -161,7 +163,7 @@ int core_word_include(ReconnVM* vm) {
     }
     fclose(handle);
   }
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
 int core_word_words(ReconnVM* vm) { return 1; }
@@ -179,7 +181,7 @@ int core_word_stack(ReconnVM* vm) {
            rcn_element_data_to_cstring(e));
   }
   printf("\n");
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
 int core_word_top(ReconnVM* vm) {
@@ -188,7 +190,7 @@ int core_word_top(ReconnVM* vm) {
   e = rcn_list_get_at(vm->value_stack, vm->value_stack->top);
   printf(" (%s)[%s]\n", rcn_element_kind_to_cstring(e),
          rcn_element_data_to_cstring(e));
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
 // int core_word_quote(){}
@@ -199,7 +201,7 @@ int core_word_do(ReconnVM* vm) {
   rcn_vm_pop_value(vm, e);
   assert(e->kind == RECONN_ELEMENT_CSTRING);
   rcn_vm_push_run(vm, e);
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
 int core_register_all(ReconnVM* vm) {
@@ -228,8 +230,10 @@ int core_register_all(ReconnVM* vm) {
 
   // rcn_vm_add_primary(vm, "#break", core_word_);
 
-  return 1;
+  return RECONN_ERROR_SUCCESS;
 }
-int core_register_single(ReconnVM* vm, const char* name) { return 1; }
+int core_register_single(ReconnVM* vm, const char* name) {
+  return RECONN_ERROR_NOT_IMPLEMENTED;
+}
 
 #endif

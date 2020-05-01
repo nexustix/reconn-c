@@ -17,7 +17,8 @@ void rcn_list_resize(ReconnList* self, unsigned long size) {
 
 int rcn_list_is_empty(ReconnList* self) { return !self->top; }
 
-void list_set_at(ReconnList* self, unsigned long index, ReconnElement* value) {
+void rcn_list_set_at(ReconnList* self, unsigned long index,
+                     ReconnElement* value) {
   assert(index <= self->top);
   self->elements[index].data = value->data;
   self->elements[index].kind = value->kind;
@@ -40,7 +41,7 @@ void rcn_list_push(ReconnList* self, ReconnElement* value) {
   }
   self->top++;
 
-  list_set_at(self, self->top, value);
+  rcn_list_set_at(self, self->top, value);
 }
 
 ReconnElement* rcn_list_pop(ReconnList* self, ReconnElement* value) {
@@ -61,7 +62,7 @@ ReconnElement* rcn_list_pop(ReconnList* self, ReconnElement* value) {
 unsigned long rcn_list_insert(ReconnList* self, ReconnElement* value) {
   for (unsigned long i = 1; i < self->top; i++) {
     if (self->elements[i].kind == RECONN_ELEMENT_EMPTY) {
-      list_set_at(self, i, value);
+      rcn_list_set_at(self, i, value);
       return i;
     }
   }

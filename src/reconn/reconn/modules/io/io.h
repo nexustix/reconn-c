@@ -45,9 +45,11 @@ int io_register_all(ReconnVM* vm) {
   rcn_vm_add_primary(vm, "print", io_word_print);
   rcn_vm_add_primary(vm, "println", io_word_println);
   rcn_vm_add_primary(vm, "flush", io_word_flush);
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
-int io_register_single(ReconnVM* vm, const char* name) { return 1; }
+int io_register_single(ReconnVM* vm, const char* name) {
+  return RECONN_ERROR_NOT_IMPLEMENTED;
+}
 
 #endif

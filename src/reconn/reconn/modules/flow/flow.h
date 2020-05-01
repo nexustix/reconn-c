@@ -26,7 +26,7 @@ int flow_word_if(ReconnVM* vm) {
   free(yes);
   free(value);
 
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 int flow_word_when(ReconnVM* vm) {
   ReconnElement* yes = rcn_newReconnElement();
@@ -44,15 +44,17 @@ int flow_word_when(ReconnVM* vm) {
 
   free(yes);
   free(value);
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
 int flow_register_all(ReconnVM* vm) {
   rcn_vm_add_primary(vm, "if", flow_word_if);
   rcn_vm_add_primary(vm, "when", flow_word_when);
-  return 0;
+  return RECONN_ERROR_SUCCESS;
 }
 
-int flow_register_single(ReconnVM* vm, const char* name) { return 1; }
+int flow_register_single(ReconnVM* vm, const char* name) {
+  return RECONN_ERROR_NOT_IMPLEMENTED;
+}
 
 #endif

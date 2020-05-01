@@ -7,10 +7,12 @@
 resize while preserving contents, non zeroed
 ### free ( :ptr -- )
 
-### get ( :ptr -- value:? )
-### set ( :ptr value:? -- )
+### peek ( :ptr -- value:u8 )
+retrieve octet at adress
+### poke ( :ptr value:u8 -- )
+set octet at adress
 
-### allot ( length:int -- :ptr ) COMPILE
-allocate given amount of space in memory
-### callot ( length:int -- :ptr ) COMPILE
-allocate given amount of zeroed space in memory
+### reserve ( octet_count:int -- :ptr ) COMPILE
+reserve given amount of space in memory
+### creserve ( octet_count:int -- :ptr ) COMPILE
+reserve given amount of cleared/zeroed space in memory
