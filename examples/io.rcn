@@ -1,0 +1,6 @@
+:io #use
+
+"what is your name ?" println
+:> print
+inputln
+"nice to meet you " print println

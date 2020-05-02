@@ -10,6 +10,7 @@ static char* core_content_root;
 #include "../arithmetic/arithmetic.h"
 #include "../flow/flow.h"
 #include "../io/io.h"
+#include "../stack/stack.h"
 #include "../var/var.h"
 #include "reconn/parse.h"
 #include "reconn/vm.h"
@@ -99,7 +100,8 @@ int core_word_use(ReconnVM* vm) {
     io_register_all(vm);
     //} else if (strcmp(use_name, "string") == 0) {
     //} else if (strcmp(use_name, "memory") == 0) {
-    //} else if (strcmp(use_name, "stack") == 0) {
+  } else if (strcmp(use_name, "stack") == 0) {
+    stack_register_all(vm);
     //} else if (strcmp(use_name, "logic") == 0) {
   } else if (strcmp(use_name, "var") == 0) {
     var_register_all(vm);

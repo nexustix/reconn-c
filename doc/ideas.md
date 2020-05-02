@@ -1,7 +1,9 @@
 ideas for potential alterations or improvements
 
 - treat the "vm" more like a word "assembly line"
+
 - let secondary words be more self contained
+
 - get rid of all the silly amounts of strings everywhere, strings are terrible
 - multiple stacks ? ( would probably be a mess word wise ) ( might hook into multithreading ? ) ( reduces elegance )
 - make stack more homogenous
