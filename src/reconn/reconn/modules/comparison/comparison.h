@@ -18,11 +18,20 @@ int comparison_word_eq(ReconnVM* vm) {
   rcn_vm_pop_value(vm, b);
   rcn_vm_pop_value(vm, a);
 
-  assert(rcn_element_is_integer(a) && rcn_element_is_integer(b));
-  unsigned char* rn = (unsigned char*)calloc(1, sizeof(unsigned char));
-  *rn = rcn_element_take_i64(a, 0) == rcn_element_take_i64(b, 0);
-  rcn_element_set_u8(r, rn);
-  rcn_vm_push_value(vm, r);
+  if (rcn_element_is_integer(a) && rcn_element_is_integer(b)) {
+    unsigned char* rn = (unsigned char*)calloc(1, sizeof(unsigned char));
+    *rn = rcn_element_take_i64(a, 0) == rcn_element_take_i64(b, 0);
+    rcn_element_set_u8(r, rn);
+    rcn_vm_push_value(vm, r);
+  } else if (a->kind == RECONN_ELEMENT_CSTRING &&
+             b->kind == RECONN_ELEMENT_CSTRING) {
+    unsigned char* rn = (unsigned char*)calloc(1, sizeof(unsigned char));
+    *rn = strcmp(rcn_element_get_cstring(a), rcn_element_get_cstring(b)) == 0;
+    rcn_element_set_u8(r, rn);
+    rcn_vm_push_value(vm, r);
+  } else {
+    assert(0);
+  }
 
   free(b);
   free(a);

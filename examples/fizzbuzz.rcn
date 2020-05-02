@@ -1,0 +1,28 @@
+
+
+:io #use
+:arithmetic #use
+:comparison #use
+:var #use
+:stack #use
+:flow #use
+
+def do_fizz " Fizz" print end
+def do_buzz " Buzz" print end
+def fizz 3 % 0 = :do_fizz when end
+def buzz 5 % 0 = :do_buzz when end
+
+def i var end 0 i vset
+def next i vget 1 + i vset end
+
+def fizzbuzz
+  i vget
+  dup print
+  dup fizz
+  buzz
+  ", " print
+  
+  next i vget 302 <= :fizzbuzz when
+end
+
+fizzbuzz : println
