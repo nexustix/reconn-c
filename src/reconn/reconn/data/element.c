@@ -461,3 +461,33 @@ intmax_t rcn_element_to_intmax(ReconnElement* self) {
   return tmp_value;
 }
 */
+
+long long rcn_element_take_i64(ReconnElement* self, int cleanup) {
+  long long r = 0;
+  switch (self->kind) {
+    case RECONN_ELEMENT_I8:
+      r = (long long)*(char*)self->data;
+      break;
+    case RECONN_ELEMENT_I16:
+      r = (long long)*(short*)self->data;
+      break;
+    case RECONN_ELEMENT_I32:
+      r = (long long)*(long*)self->data;
+      break;
+    case RECONN_ELEMENT_U8:
+      r = (long long)*(unsigned char*)self->data;
+      break;
+    case RECONN_ELEMENT_U16:
+      r = (long long)*(unsigned short*)self->data;
+      break;
+    case RECONN_ELEMENT_U32:
+      r = (long long)*(unsigned long*)self->data;
+      break;
+
+    default:
+      rcn_error(0, "unable to take i32");
+      break;
+  }
+  if (cleanup) free(self->data);
+  return r;
+}

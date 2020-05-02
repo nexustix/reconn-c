@@ -8,6 +8,7 @@ static char* core_content_root;
 #include <stdlib.h>
 
 #include "../arithmetic/arithmetic.h"
+#include "../comparison/comparison.h"
 #include "../flow/flow.h"
 #include "../io/io.h"
 #include "../stack/stack.h"
@@ -102,7 +103,8 @@ int core_word_use(ReconnVM* vm) {
     //} else if (strcmp(use_name, "memory") == 0) {
   } else if (strcmp(use_name, "stack") == 0) {
     stack_register_all(vm);
-    //} else if (strcmp(use_name, "logic") == 0) {
+  } else if (strcmp(use_name, "comparison") == 0) {
+    comparison_register_all(vm);
   } else if (strcmp(use_name, "var") == 0) {
     var_register_all(vm);
   } else if (strcmp(use_name, "flow") == 0) {

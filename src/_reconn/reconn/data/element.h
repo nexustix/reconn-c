@@ -76,4 +76,6 @@ unsigned char rcn_element_take_u8(ReconnElement* self, int cleanup);
 unsigned short rcn_element_take_u16(ReconnElement* self, int cleanup);
 unsigned long rcn_element_take_u32(ReconnElement* self, int cleanup);
 
+long long rcn_element_take_i64(ReconnElement* self, int cleanup);
+
 #endif
