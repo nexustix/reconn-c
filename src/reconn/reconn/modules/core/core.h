@@ -181,8 +181,11 @@ int core_word_stack(ReconnVM* vm) {
   for (unsigned long i = 0; i < vm->value_stack->top; i++) {
     index = vm->value_stack->top - i;
     e = rcn_list_get_at(vm->value_stack, index);
-    printf("(%s)[%s] ", rcn_element_kind_to_cstring(e),
-           rcn_element_data_to_cstring(e));
+    const char* kind = rcn_element_kind_to_cstring(e);
+    const char* data = rcn_element_data_to_cstring(e);
+    printf("(%s)[%s] ", kind, data);
+    free(kind);
+    free(data);
   }
   printf("\n");
   return RECONN_ERROR_SUCCESS;
@@ -192,8 +195,11 @@ int core_word_top(ReconnVM* vm) {
   static ReconnElement* e;
   if (!e) e = rcn_newReconnElement();
   e = rcn_list_get_at(vm->value_stack, vm->value_stack->top);
-  printf(" (%s)[%s]\n", rcn_element_kind_to_cstring(e),
-         rcn_element_data_to_cstring(e));
+  const char* kind = rcn_element_kind_to_cstring(e);
+  const char* data = rcn_element_data_to_cstring(e);
+  printf(" (%s)[%s]\n", kind, data);
+  free(kind);
+  free(data);
   return RECONN_ERROR_SUCCESS;
 }
 

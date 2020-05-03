@@ -24,6 +24,8 @@ int arithmetic_word_add(ReconnVM* vm) {
     rcn_element_set_i32(r, nr);
     rcn_vm_push_value(vm, r);
 
+    free(r);
+
   } else {
     unsigned long na = rcn_element_take_u32(a, 0);
     unsigned long nb = rcn_element_take_u32(b, 0);
@@ -31,6 +33,8 @@ int arithmetic_word_add(ReconnVM* vm) {
     *nr = na + nb;
     rcn_element_set_u32(r, nr);
     rcn_vm_push_value(vm, r);
+
+    free(r);
   }
 
   free(a);
@@ -57,6 +61,8 @@ int arithmetic_word_sub(ReconnVM* vm) {
     rcn_element_set_i32(r, nr);
     rcn_vm_push_value(vm, r);
 
+    free(r);
+
   } else {
     unsigned long na = rcn_element_take_u32(a, 0);
     unsigned long nb = rcn_element_take_u32(b, 0);
@@ -64,6 +70,8 @@ int arithmetic_word_sub(ReconnVM* vm) {
     *nr = na - nb;
     rcn_element_set_u32(r, nr);
     rcn_vm_push_value(vm, r);
+
+    free(r);
   }
 
   free(a);
@@ -90,6 +98,8 @@ int arithmetic_word_mul(ReconnVM* vm) {
     rcn_element_set_i32(r, nr);
     rcn_vm_push_value(vm, r);
 
+    free(r);
+
   } else {
     unsigned long na = rcn_element_take_u32(a, 0);
     unsigned long nb = rcn_element_take_u32(b, 0);
@@ -97,6 +107,8 @@ int arithmetic_word_mul(ReconnVM* vm) {
     *nr = na * nb;
     rcn_element_set_u32(r, nr);
     rcn_vm_push_value(vm, r);
+
+    free(r);
   }
 
   free(a);
@@ -123,6 +135,7 @@ int arithmetic_word_idiv(ReconnVM* vm) {
     rcn_element_set_i32(r, nr);
     rcn_vm_push_value(vm, r);
 
+    free(r);
   } else {
     unsigned long na = rcn_element_take_u32(a, 0);
     unsigned long nb = rcn_element_take_u32(b, 0);
@@ -130,6 +143,8 @@ int arithmetic_word_idiv(ReconnVM* vm) {
     *nr = na / nb;
     rcn_element_set_u32(r, nr);
     rcn_vm_push_value(vm, r);
+
+    free(r);
   }
 
   free(a);
@@ -158,6 +173,8 @@ int arithmetic_word_div(ReconnVM* vm) {
     rcn_element_set_i32(r, nr);
     rcn_vm_push_value(vm, r);
 
+    free(r);
+    free(r2);
   } else {
     unsigned long na = rcn_element_take_u32(a, 0);
     unsigned long nb = rcn_element_take_u32(b, 0);
@@ -169,6 +186,9 @@ int arithmetic_word_div(ReconnVM* vm) {
     rcn_element_set_u32(r2, nr2);
     rcn_vm_push_value(vm, r);
     rcn_vm_push_value(vm, r2);
+
+    free(r);
+    free(r2);
   }
 
   free(a);
@@ -195,6 +215,8 @@ int arithmetic_word_mod(ReconnVM* vm) {
     rcn_element_set_i32(r, nr);
     rcn_vm_push_value(vm, r);
 
+    free(r);
+
   } else {
     unsigned long na = rcn_element_take_u32(a, 0);
     unsigned long nb = rcn_element_take_u32(b, 0);
@@ -202,10 +224,13 @@ int arithmetic_word_mod(ReconnVM* vm) {
     *nr = na % nb;
     rcn_element_set_u32(r, nr);
     rcn_vm_push_value(vm, r);
+
+    free(r);
   }
 
   free(a);
   free(b);
+  // free(r);
 
   return RECONN_ERROR_SUCCESS;
 }

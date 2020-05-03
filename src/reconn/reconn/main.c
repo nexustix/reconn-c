@@ -85,6 +85,7 @@ int main(int argc, const char *argv[]) {
     }
   }
 
+  free(vm);
   return 0;
 }
 

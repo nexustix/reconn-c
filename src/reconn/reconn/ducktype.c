@@ -13,7 +13,7 @@ ReconnElement *rcn_ducktype_as_string(const char *token, int remove_quotes) {
       } else {
         // char *result = (char *)malloc(length - 2);
         strncpy(result, token + 1, length - 2);
-        result[length] = 0;
+        // result[length] = 0;
         // printf("A >%lu< >%s<\n", length, result);
         rcn_element_set_cstring(e, result);
         return e;
@@ -24,7 +24,9 @@ ReconnElement *rcn_ducktype_as_string(const char *token, int remove_quotes) {
       rcn_element_set_cstring(e, result);
       return e;
     }
+    free(e);
   }
+  free(result);
   return NULL;
 };
 
@@ -50,13 +52,15 @@ ReconnElement *rcn_ducktype_as_quote(const char *token, int remove_quotes) {
       rcn_element_set_cstring(e, result);
       return e;
     }
+    free(e);
   }
+  free(result);
   return NULL;
 }
 
 ReconnElement *rcn_ducktype_as_number(const char *token, int base) {
   int is_signed = (token[0] == '-' || token[0] == '+');
-  char *endptr;
+  char *endptr = NULL;
 
   // handle number being 0
   if (strcmp(token, "0") == 0) {

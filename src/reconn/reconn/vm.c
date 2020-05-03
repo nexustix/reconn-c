@@ -205,16 +205,22 @@ ReconnElement* rcn_vm_find_word(ReconnVM* self, const char* token) {
     }
     result =
         rcn_dictionary_get(self->dictionaries[rcn_vm_state(self)], wordname);
-    if (result) return result;
+    if (result) {
+      free(namespace);
+      free(wordname);
+      return result;
+    }
     if (!namespace[0]) break;
     rcn_seplob(namespace, '.');
   }
+  free(namespace);
+  free(wordname);
   return NULL;
 }
 
 int rcn_vm_do(ReconnVM* self, const char* token) {
   // static ReconnElement* e;
-  // if (!e) e = newReconnElement();
+  // if (!e) e = rcn_newReconnElement();
 
   // FIXME - comb for memory leaks
   ReconnElement* e = rcn_newReconnElement();
@@ -223,25 +229,34 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
 
   if (strcmp("(", token) == 0) {
     self->comment++;
+    // free(e);
     return 0;
   } else if (strcmp(")", token) == 0) {
     self->comment--;
     // assert(self->comment >= 0);
     rcn_error(self->comment >= 0, "unbalanced comments");
+    // free(e);
     return 0;
   }
-  if (self->comment) return 0;
+  if (self->comment) {
+    // free(e);
+    return 0;
+  }
 
   int state = rcn_vm_state(self);
+  // ReconnElement* testa = rcn_newReconnElement();
   switch (state) {
     case RECONN_STATE_NORMAL:
       // fprintf(stderr, " - inside NORMAL\n");
+      free(e);
       e = rcn_vm_find_word(self, token);
       if (e) {
         if (e->kind == RECONN_ELEMENT_WORD_PRIMARY) {
           rcn_element_get_pword(e)(self);
-          // TODO use run stack push and pop functions instead of ad-hoc
+          // free(e);
+          return 0;
         } else if (e->kind == RECONN_ELEMENT_WORD_SECONDARY) {
+          // FIXME evaluate for memory leaks
           ReconnList* words = rcn_element_get_sword(e);
           for (unsigned long i = 0; i < words->top; i++) {
             e = rcn_list_get_at(words, words->top - i);
@@ -249,7 +264,10 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
                       "non-cstring in secondary word");
             rcn_list_push(self->run_stack, e);
           }
+          // free(e);
+          return 0;
         } else {
+          // printf("%lu\n", e->kind);
           rcn_error(0, "non-word in dictionary");
         }
       } else {
@@ -260,6 +278,8 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
               // element_set_bignum(
               //    element, bignum_copy_cstring(element_get_cstring(element)));
               rcn_vm_push_value(self, element);
+              // free(e);
+              free(element);
               return 0;
               break;
 
@@ -275,6 +295,8 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
             case RECONN_ELEMENT_U16:
             case RECONN_ELEMENT_U32:
               rcn_vm_push_value(self, element);
+              // free(e);
+              free(element);
               return 0;
               break;
 
@@ -285,6 +307,8 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
         } else {
           fprintf(stderr, " ! no idea what >%s< means\n", token);
         }
+        // free(e);
+        free(element);
         return 1;
       }
       break;
@@ -298,8 +322,12 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
         rcn_error(e->kind == RECONN_ELEMENT_WORD_PRIMARY,
                   "tried to call non-primary from dictionary");
         rcn_element_get_pword(e)(self);
+        // free(e);
+        return 0;
       } else {
         rcn_list_push(self->word_buffer, rcn_element_set_cstring(e, token));
+        // free(e);
+        return 0;
       }
       break;
 
@@ -308,14 +336,19 @@ int rcn_vm_do(ReconnVM* self, const char* token) {
       if (strcmp(TOKEN_END, token) == 0) {
         rcn_vm_push_wordbuffer(self, TOKEN_END);
         rcn_vm_pop_state(self);
+        // free(e);
+        return 0;
       } else {
         rcn_list_push(self->word_buffer, rcn_element_set_cstring(e, token));
+        // free(e);
+        return 0;
       }
       break;
 
     default:
       break;
   }
+  // free(e);
   return 0;
 }
 
@@ -325,8 +358,12 @@ int rcn_vm_run(ReconnVM* self) {
   while (!rcn_list_is_empty(self->run_stack)) {
     rcn_list_pop(self->run_stack, e);
     if (e->kind == RECONN_ELEMENT_CSTRING) {
-      if (rcn_vm_do(self, rcn_element_get_cstring(e))) return 1;
-      ;
+      const char* v = rcn_element_get_cstring(e);
+      if (rcn_vm_do(self, v)) {
+        // free(v);
+        return 1;
+      }
+      // free(v);
     }
   }
   return 0;
@@ -350,11 +387,14 @@ int rcn_vm_execute(ReconnVM* self, const char* word) {
 
 int rcn_vm_execute_all(ReconnVM* self, ReconnList* words, int ok) {
   for (unsigned long i = 1; i <= words->top; i++) {
+    // const char* v = rcn_element_get_cstring(rcn_list_get_at(words, i));
     if (rcn_vm_execute(self,
                        rcn_element_get_cstring(rcn_list_get_at(words, i)))) {
       if (ok) fprintf(stderr, " ! ERR\n");
+      // free(v);
       return 1;
     }
+    // free(v);
   }
   if (ok) fprintf(stderr, " - OK\n");
   return 0;

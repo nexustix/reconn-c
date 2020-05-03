@@ -9,10 +9,11 @@
 // int io_word_emit(ReconnVM* vm) { return 1; }
 
 int io_word_print(ReconnVM* vm) {
-  static ReconnElement* e;
-  if (!e) e = rcn_newReconnElement();
+  ReconnElement* e = rcn_newReconnElement();
   rcn_vm_pop_value(vm, e);
-  printf("%s", rcn_element_data_to_cstring(e));
+  const char* data = rcn_element_data_to_cstring(e);
+  printf("%s", data);
+  free(data);
   free(e);
   return RECONN_ERROR_SUCCESS;
 }
@@ -20,10 +21,11 @@ int io_word_print(ReconnVM* vm) {
 // int io_word_eprint(ReconnVM* vm) { return 1; }
 
 int io_word_println(ReconnVM* vm) {
-  static ReconnElement* e;
-  if (!e) e = rcn_newReconnElement();
+  ReconnElement* e = rcn_newReconnElement();
   rcn_vm_pop_value(vm, e);
-  printf("%s\n", rcn_element_data_to_cstring(e));
+  const char* data = rcn_element_data_to_cstring(e);
+  printf("%s\n", data);
+  free(data);
   free(e);
   return RECONN_ERROR_SUCCESS;
 }

@@ -21,8 +21,8 @@ def fizzbuzz
   dup fizz
   buzz
   ", " print
-  
-  next i vget 302 <= :fizzbuzz when
+  next i vget 25000 <= :fizzbuzz when
 end
 
+fizzbuzz : println
 fizzbuzz : println
