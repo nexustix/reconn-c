@@ -9,3 +9,8 @@ build/
 Makefile
 
 .vscode/
+
+.ninja_deps
+.ninja_logs
+
+notes/

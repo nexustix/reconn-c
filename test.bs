@@ -1,0 +1,60 @@
+head
+
+c_flags_fast = -Wall -Werror -march=native -g0 -O2
+c_flags_debug = -Wall -Werror -g
+c_flags =
+c_compiler = gcc
+
+rule c_so
+  command = $c_compiler -x c -shared -fpic $c_flags -o $out $in
+
+rule c_o
+  command = $c_compiler -x c $c_flags -o $out -c $in
+
+rule c_exe
+  command = $c_compiler $c_flags -o $out $in
+
+leave
+
+tail
+
+c_flags = $c_flags $c_flags_debug -I src/head -I trd/include
+
+build rcn_stack_o: phony build/stack/o/stack.o
+  c_flags = $c_flags_fast
+
+build rcn_demo: phony build/demo/exe/demo.exe
+  c_flags = $c_flags_debug
+
+default rcn_stack_o rcn_demo
+
+leave
+
+enter stack
+
+  source src/head/reconn/stack
+  file stack_c_files stack.h
+
+  enter o
+    merge stack_c_files c_o stack.o
+  leave
+
+leave
+
+enter demo
+
+  source src/impl/reconn/demo
+  file demo_c_files main.c
+
+  enter o
+    merge demo_c_files c_o demo.o
+  leave
+
+  #cat demo_o_files demo/o
+  #cat demo_o_files stack/o
+
+  enter exe
+    merge demo/o c_exe demo.exe
+  leave
+
+leave

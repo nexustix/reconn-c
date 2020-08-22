@@ -1,7 +1,0 @@
-:var #use
-:io #use
-
-def cake var end
-
-1234 cake vset
-cake vget println

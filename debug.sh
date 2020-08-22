@@ -1,9 +1,4 @@
-premake5 gmake2
-make
-
-if [ $# -gt 0 ]; then
-  ./bin/Debug/reconn $@
-else
-  #rlwrap -S ">" ./bin/Debug/reconn $@
-  ./bin/Debug/reconn $@
-fi
+rm -r build/
+bs --debug -o test.ninja test.bs
+ninja -f ./test.ninja
+build/demo/exe/demo.exe

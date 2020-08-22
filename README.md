@@ -6,7 +6,7 @@
 ## Why ?
   I was reading the code for Jonesforth by Richard W.M. Jones and the book "Threaded Interpretive Languages - Their Design and Implementation" by R.G. Loelinger and realized that stack-based languages are ridiculously easy to implement. I played with the idea of writing some kind of meta-assembler to generate assembly code for different architectures before that, but realized that such a taks would easily explode in scope as soon as you consider adding macros and other features. While reading those documents i realized that the FORTH family, or Threaded Interpretive Languages, could be a great fit for what i wanted to acheive with my meta-assembler concept and decided to write a language to test my hypothesis.
 
-  The only issue i saw was that most of the FORTH/TIL languages i found relied on the beauty of assembly code to provide a way to elegantly compile words as they are entered. Given that i wanted to prototype my language in a higher level language i decided to mostly take the concepts i gathered from reading about FORTH and simmilar languages and integrate them into a "new" design. This abomination also draws some inspiration from other languages such as Lisp, BASIC and Factor.
+  The only issue i saw was that most of the FORTH/TIL languages i found relied on the beauty of assembly code to provide a way to elegantly compile words as they are entered. Given that i wanted to prototype my language in a higher level language i decided to mostly take the concepts i gathered from reading about FORTH and simmilar languages and integrate them into a "new" design. This abomination also draws some inspiration from other languages such as Lisp, BASIC, Factor and COBOL.
 
 ## Goals
 
