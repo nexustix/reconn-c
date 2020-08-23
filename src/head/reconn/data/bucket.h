@@ -15,6 +15,22 @@ typedef struct ReconnBucket {
   ReconnBucketItem *cells;
 } ReconnBucket;
 
+void reconn_element_free(ReconnBucketItem *self, int free_self) {
+  // free(self->data);
+  free(self->id);
+  if (free_self)
+    free(self);
+}
+
+void reconn_bucket_free(ReconnBucket *self, int free_self) {
+  for (int i = 0; i < stb_sb_count(self->cells); i++) {
+    reconn_element_free(&(self->cells[i]), 0);
+  }
+  stb_sb_free(self->cells);
+  if (free_self)
+    free(self);
+}
+
 ReconnBucketItem reconn_makeBucketItem(void *data, ReconnValueKind kind,
                                        const char *id) {
   ReconnBucketItem self;
@@ -43,7 +59,7 @@ size_t reconn_bucket_first_free(ReconnBucket *self) {
   return 0;
 }
 
-size_t reconn_bucket_has_id(ReconnBucket *self, const char *id) {
+size_t reconn_bucket_find(ReconnBucket *self, const char *id) {
   for (int i = 1; i < stb_sb_count(self->cells); i++) {
     if (self->cells[i].kind != RECONN_VALUE_EMPTY &&
         strcmp(self->cells[i].id, id) == 0) {
@@ -71,11 +87,12 @@ size_t reconn_bucket_add(ReconnBucket *self, void *data, const char *id) {
   return index;
 }
 
-void *reconn_bucket_get(ReconnBucket *self, const char *id) {
-  size_t index = reconn_bucket_has_id(self, id);
+void *reconn_bucket_findv(ReconnBucket *self, const char *id) {
+  size_t index = reconn_bucket_find(self, id);
   return self->cells[index].data;
 }
 
+/*
 // void reconn_bucket_remove_first(ReconnBucket *self);
 void reconn_bucket_remove_all(ReconnBucket *self, const char *id) {
   for (int i = 1; i < stb_sb_count(self->cells); i++) {
@@ -85,5 +102,6 @@ void reconn_bucket_remove_all(ReconnBucket *self, const char *id) {
     }
   }
 }
+*/
 
 #endif

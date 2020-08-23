@@ -43,7 +43,7 @@ leave
 
 enter demo
 
-  source src/impl/demo
+  source src/impl/spike
   file demo_c_files main.c
 
   enter o

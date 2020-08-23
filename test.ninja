@@ -14,7 +14,7 @@ rule c_exe
   command = $c_compiler $c_flags -o $out $in
 
 build build/stack/o/stack.o: c_o src/head/reconn/data/stack.h
-build build/demo/o/demo.o: c_o src/impl/demo/main.c
+build build/demo/o/demo.o: c_o src/impl/spike/main.c
 build build/demo/exe/demo.exe: c_exe build/demo/o/demo.o
 
 c_flags = $c_flags $c_flags_debug -I src/head -I trd/include
