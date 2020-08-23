@@ -1,31 +1,13 @@
 #ifndef RECONN_STACK_STACK_H
 #define RECONN_STACK_STACK_H
 
+#include "value.h"
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
-typedef enum ReconnStackItemKind {
-
-  RECONN_STACK_ITEM_VOID,
-  RECONN_STACK_ITEM_EMPTY,
-  RECONN_STACK_ITEM_U8,
-  RECONN_STACK_ITEM_U16,
-  RECONN_STACK_ITEM_U32,
-  RECONN_STACK_ITEM_U64,
-  RECONN_STACK_ITEM_S8,
-  RECONN_STACK_ITEM_S16,
-  RECONN_STACK_ITEM_S32,
-  RECONN_STACK_ITEM_S64,
-  RECONN_STACK_ITEM_F32,
-  RECONN_STACK_ITEM_F64,
-  RECONN_STACK_ITEM_BYTE_STRING,
-  RECONN_STACK_ITEM_C_STRING,
-
-} ReconnStackItemKind;
-
 typedef struct ReconnStackItem {
-  ReconnStackItemKind kind;
+  ReconnValueKind kind;
   unsigned short start;
   unsigned short stop;
 } ReconnStackItem;
@@ -33,6 +15,9 @@ typedef struct ReconnStackItem {
 typedef struct ReconnStack {
   unsigned short top;
   unsigned char count;
+  // TODO could be made dynamic ?
+  // Plain Old Data is more elegant for now
+  // TODO evaulate default sizes (make smaller ?)
   unsigned char data[65536];
   ReconnStackItem items[256];
 } ReconnStack;
@@ -45,7 +30,7 @@ ReconnStack reconn_makeStack() {
 }
 
 void reconn_stack_print(ReconnStack *self) {
-  printf("======\nTOP:%i\n", self->top);
+  printf("======\nTOP:%i\nCOUNT:%i\n", self->top, self->count);
   for (unsigned int i = 0; i < self->count; i++) {
     printf("(%5i:%5i)\n", self->items[i].start, self->items[i].stop);
     for (unsigned int si = self->items[i].start; si < self->items[i].stop;
@@ -63,8 +48,7 @@ ADD ITEMS
 =========
 */
 
-static void reconn_stack_finalize_push(ReconnStack *self,
-                                       ReconnStackItemKind kind,
+static void reconn_stack_finalize_push(ReconnStack *self, ReconnValueKind kind,
                                        unsigned short size) {
   self->items[self->count].kind = kind;
   self->items[self->count].start = self->top;
@@ -78,70 +62,70 @@ void reconn_stack_push_u8(ReconnStack *self, unsigned char value) {
   unsigned char *location = (unsigned char *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_U8, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_U8, sizeof(value));
 };
 
 void reconn_stack_push_u16(ReconnStack *self, unsigned short value) {
   unsigned short *location = (unsigned short *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_U16, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_U16, sizeof(value));
 };
 
 void reconn_stack_push_u32(ReconnStack *self, unsigned long value) {
   unsigned long *location = (unsigned long *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_U32, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_U32, sizeof(value));
 };
 
 void reconn_stack_push_u64(ReconnStack *self, unsigned long long value) {
   unsigned long long *location = (unsigned long long *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_U64, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_U64, sizeof(value));
 };
 
 void reconn_stack_push_s8(ReconnStack *self, char value) {
   char *location = (char *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_S8, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_S8, sizeof(value));
 };
 
 void reconn_stack_push_s16(ReconnStack *self, short value) {
   short *location = (short *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_S16, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_S16, sizeof(value));
 };
 
 void reconn_stack_push_s32(ReconnStack *self, long value) {
   long *location = (long *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_S32, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_S32, sizeof(value));
 };
 
 void reconn_stack_push_s64(ReconnStack *self, long long value) {
   long long *location = (long long *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_S64, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_S64, sizeof(value));
 };
 
 void reconn_stack_push_f32(ReconnStack *self, float value) {
   float *location = (float *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_F32, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_F32, sizeof(value));
 };
 
 void reconn_stack_push_f64(ReconnStack *self, double value) {
   double *location = (double *)&self->data[self->top];
   *location = value;
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_F64, sizeof(value));
+  reconn_stack_finalize_push(self, RECONN_VALUE_F64, sizeof(value));
 };
 
 void reconn_stack_push_cstring(ReconnStack *self, char *value) {
@@ -149,7 +133,7 @@ void reconn_stack_push_cstring(ReconnStack *self, char *value) {
   char *location = (char *)&self->data[self->top];
   memcpy(location, value, length);
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_C_STRING, length);
+  reconn_stack_finalize_push(self, RECONN_VALUE_C_STRING, length);
 }
 
 void reconn_stack_push_string(ReconnStack *self, char *value,
@@ -157,7 +141,7 @@ void reconn_stack_push_string(ReconnStack *self, char *value,
   char *location = (char *)&self->data[self->top];
   memcpy(location, value, length);
 
-  reconn_stack_finalize_push(self, RECONN_STACK_ITEM_BYTE_STRING, length);
+  reconn_stack_finalize_push(self, RECONN_VALUE_BYTE_STRING, length);
 }
 
 /*
@@ -261,9 +245,8 @@ UTILLITY FUNCTIONS
 ==================
 */
 
-unsigned char reconn_stack_size(ReconnStack *self) { return self->count; }
-ReconnStackItemKind reconn_stack_kind_at(ReconnStack *self,
-                                         unsigned char index) {
+unsigned char reconn_stack_count(ReconnStack *self) { return self->count; }
+ReconnValueKind reconn_stack_kind_at(ReconnStack *self, unsigned char index) {
   return self->items[index].kind;
 }
 

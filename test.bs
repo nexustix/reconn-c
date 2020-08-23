@@ -32,7 +32,7 @@ leave
 
 enter stack
 
-  source src/head/reconn/stack
+  source src/head/reconn/data
   file stack_c_files stack.h
 
   enter o
@@ -43,7 +43,7 @@ leave
 
 enter demo
 
-  source src/impl/reconn/demo
+  source src/impl/demo
   file demo_c_files main.c
 
   enter o

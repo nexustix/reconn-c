@@ -11,6 +11,6 @@ Makefile
 .vscode/
 
 .ninja_deps
-.ninja_logs
+.ninja_log
 
 notes/
