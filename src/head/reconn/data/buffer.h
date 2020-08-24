@@ -42,9 +42,21 @@ ReconnBuffer reconn_makeBuffer() {
 }
 
 ReconnBuffer *reconn_newBuffer() {
-  ReconnBuffer *self = malloc(sizeof(ReconnBuffer));
+  ReconnBuffer *self = (ReconnBuffer *)malloc(sizeof(ReconnBuffer));
   *self = reconn_makeBuffer();
   return self;
+}
+
+void reconn_buffer_print(ReconnBuffer *self) {
+  printf("======\nTOP:%li\nCOUNT:%li\n", self->end, self->count);
+  for (size_t i = 0; i < self->count; i++) {
+    printf("(%5lu:%5lu)\n", self->items[i].start, self->items[i].stop);
+    for (size_t si = self->items[i].start; si < self->items[i].stop; si++) {
+      const unsigned char data = self->data[si];
+      printf("(%3lu:%5lu) %02x (%3i)[%c]\n", i, si, data, data, data);
+    }
+    printf("---\n");
+  }
 }
 
 // ensure each pointer has atleast "minsize" amount of reserved space

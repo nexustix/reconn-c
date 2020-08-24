@@ -2,6 +2,7 @@
 #include "reconn/data/buffer.h"
 //#include "reconn/data/stack.h"
 #include "reconn/data/value.h"
+#include "reconn/parse.h"
 #include "reconn/vm.h"
 #include <assert.h>
 #include <limits.h>
@@ -54,9 +55,48 @@ int say_hello(ReconnVM *vm) {
   return 0;
 }
 
+void repl(ReconnVM *vm) {
+
+  ReconnBuffer inputBuffer = reconn_makeBuffer();
+
+  size_t size = 0;
+  char *data = malloc(1024);
+
+  fprintf(stderr, "Reconn REPL\n");
+  fprintf(stderr, "Version: INDEV\n");
+  fprintf(stderr, ">");
+  while (1) {
+    getline(&data, &size, stdin);
+    reconn_parse_tokens(data, &inputBuffer);
+
+    while (inputBuffer.count) {
+      char *token = reconn_buffer_pop_cstring(&inputBuffer);
+      reconn_buffer_push_cstring(&vm->run_stack, token);
+      free(token);
+    }
+
+    while (reconn_vm_tick(vm))
+      ;
+
+    fprintf(stderr, ">");
+  }
+}
+
 int main() {
   tbd();
 
+  ReconnVM vm = reconn_makeVM();
+
+  reconn_vm_add_primary(&vm, "hello", say_hello);
+
+  repl(&vm);
+
+  // reconn_parse_tokens("the cake is a lie \"oh yes\" you know \"the cake\" ",
+  //                    &inputBuffer);
+  //
+  // reconn_buffer_print(&inputBuffer);
+
+  /*
   ReconnVM vm = reconn_makeVM();
 
   reconn_vm_add_primary(&vm, "hello", say_hello);
@@ -76,6 +116,7 @@ int main() {
     ;
 
   reconn_vm_free(&vm, 0);
+  */
 
   /*
   ReconnVM vm = reconn_makeVM();
