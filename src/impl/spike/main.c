@@ -60,12 +60,12 @@ void repl(ReconnVM *vm) {
   ReconnBuffer inputBuffer = reconn_makeBuffer();
 
   size_t size = 0;
-  char *data = malloc(1024);
+  char *data = NULL;
 
   fprintf(stderr, "Reconn REPL\n");
   fprintf(stderr, "Version: INDEV\n");
   fprintf(stderr, ">");
-  while (1) {
+  while (vm->running) {
     getline(&data, &size, stdin);
     reconn_parse_tokens(data, &inputBuffer);
 
@@ -80,6 +80,9 @@ void repl(ReconnVM *vm) {
 
     fprintf(stderr, ">");
   }
+
+  reconn_buffer_free(&inputBuffer, 0);
+  free(data);
 }
 
 int main() {
@@ -90,6 +93,8 @@ int main() {
   reconn_vm_add_primary(&vm, "hello", say_hello);
 
   repl(&vm);
+
+  reconn_vm_free(&vm, 0);
 
   // reconn_parse_tokens("the cake is a lie \"oh yes\" you know \"the cake\" ",
   //                    &inputBuffer);

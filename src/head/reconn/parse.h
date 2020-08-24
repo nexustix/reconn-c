@@ -36,6 +36,7 @@ unsigned int reconn_parse_string(char *data, unsigned int offset,
       if (quote_found) {
         buffer[counter] = QUOTE_CHAR;
         reconn_buffer_push_cstring(tokens, buffer);
+        free(buffer);
         return i;
       }
       buffer[counter] = cur;
@@ -64,6 +65,7 @@ void reconn_parse_tokens(char *data, ReconnBuffer *tokens) {
         buffer = (char *)calloc(size + 2, 1);
         strncpy(buffer, data + offset, size);
         reconn_buffer_push_cstring(tokens, buffer);
+        free(buffer);
         offset = i;
       } else {
         offset++;

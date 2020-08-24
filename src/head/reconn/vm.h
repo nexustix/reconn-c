@@ -28,6 +28,9 @@ typedef struct ReconnVM {
   // namespace depth
   size_t ndepth;
 
+  // TBD
+  int running;
+
 } ReconnVM;
 
 ReconnVM reconn_makeVM() {
@@ -43,6 +46,7 @@ ReconnVM reconn_makeVM() {
   self.compile_buffer = reconn_makeBuffer();
 
   self.ndepth = 0;
+  self.running = 1;
   // push null
   reconn_buffer_push_string(&self.namespace_stack, "\0", 1);
   return self;
@@ -289,6 +293,7 @@ int reconn_vm_tick(ReconnVM *self) {
     } else {
       printf("<!> unable to handle token >%s<\n", next_token);
       free(next_token);
+      self->running = 0;
       return 0;
     }
   }
