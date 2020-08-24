@@ -41,6 +41,12 @@ ReconnBuffer reconn_makeBuffer() {
   return self;
 }
 
+ReconnBuffer *reconn_newBuffer() {
+  ReconnBuffer *self = malloc(sizeof(ReconnBuffer));
+  *self = reconn_makeBuffer();
+  return self;
+}
+
 // ensure each pointer has atleast "minsize" amount of reserved space
 void reconn_buffer_resize(ReconnBuffer *self, size_t minsize) {
   // FIXME doesn't handle running out of memory
@@ -48,6 +54,7 @@ void reconn_buffer_resize(ReconnBuffer *self, size_t minsize) {
     size_t newsize = self->reserved * 2;
     self->data = (unsigned char *)realloc(self->data, newsize);
     self->items = (ReconnBufferItem *)realloc(self->items, newsize);
+
     self->reserved = newsize;
   }
 }
@@ -56,6 +63,23 @@ void reconn_buffer_grow_for(ReconnBuffer *self, size_t index, size_t size) {
   reconn_buffer_resize(self, sizeof(ReconnBufferItem) * (index + 1));
   reconn_buffer_resize(self, self->end + size);
 }
+
+/*
+ReconnBuffer *reconn_copyBuffer(ReconnBuffer *source) {
+  ReconnBuffer *copy = reconn_newBuffer();
+
+  copy->end = source->end;
+  copy->count = source->count;
+  // skipping reserved because that would mess with resizing
+
+  // FIXME use "end" instead of reserved
+  reconn_buffer_resize(copy, source->end);
+  memcpy(copy->data, source->data, source->end);
+  memcpy(copy->items, source->items, source->end);
+
+  return copy;
+}
+*/
 
 /*
 =============
@@ -146,7 +170,7 @@ void reconn_buffer_push_f64(ReconnBuffer *self, double value) {
   reconn_buffer_finalize_push(self, RECONN_VALUE_F64, sizeof(value));
 };
 
-void reconn_buffer_push_cstring(ReconnBuffer *self, char *value) {
+void reconn_buffer_push_cstring(ReconnBuffer *self, const char *value) {
   unsigned short length = strlen(value) + 1;
   reconn_buffer_grow_for(self, self->count, length);
   char *location = (char *)&self->data[self->end];
@@ -155,13 +179,20 @@ void reconn_buffer_push_cstring(ReconnBuffer *self, char *value) {
   reconn_buffer_finalize_push(self, RECONN_VALUE_C_STRING, length);
 }
 
-void reconn_buffer_push_string(ReconnBuffer *self, char *value,
+void reconn_buffer_push_string(ReconnBuffer *self, const char *value,
                                unsigned short length) {
   reconn_buffer_grow_for(self, self->count, length);
   char *location = (char *)&self->data[self->end];
   memcpy(location, value, length);
 
   reconn_buffer_finalize_push(self, RECONN_VALUE_BYTE_STRING, length);
+}
+
+void reconn_buffer_push_wordp(ReconnBuffer *self, unsigned long value) {
+  reconn_buffer_grow_for(self, self->count, sizeof(value));
+  unsigned long *location = (unsigned long *)&self->data[self->end];
+  *location = value;
+  reconn_buffer_finalize_push(self, RECONN_VALUE_WORD_POINTER, sizeof(value));
 }
 
 /*
@@ -230,18 +261,28 @@ double reconn_buffer_get_f64(ReconnBuffer *self, size_t index) {
   return *location;
 }
 
-void reconn_buffer_get_cstring(ReconnBuffer *self, size_t index, char *dest) {
+char *reconn_buffer_get_cstring(ReconnBuffer *self, size_t index) {
   unsigned char start = self->items[index].start;
   unsigned short size = self->items[index].stop - self->items[index].start;
   char *location = (char *)&self->data[start];
-  memcpy(dest, location, size);
+  char *result = malloc(size);
+  memcpy(result, location, size);
+  return result;
 }
 
-void reconn_buffer_get_string(ReconnBuffer *self, size_t index, char *dest) {
+char *reconn_buffer_get_string(ReconnBuffer *self, size_t index) {
   unsigned char start = self->items[index].start;
   unsigned short size = self->items[index].stop - self->items[index].start;
   char *location = (char *)&self->data[start];
-  memcpy(dest, location, size);
+  char *result = malloc(size);
+  memcpy(result, location, size);
+  return result;
+}
+
+unsigned long reconn_buffer_get_wordp(ReconnBuffer *self, size_t index) {
+  unsigned long *location =
+      (unsigned long *)reconn_buffer_get_void(self, index);
+  return *location & ULONG_MAX;
 }
 
 /*
@@ -315,7 +356,7 @@ double reconn_buffer_pop_f64(ReconnBuffer *self) {
   return *location;
 }
 
-void reconn_buffer_pop_cstring(ReconnBuffer *self, char *dest) {
+char *reconn_buffer_pop_cstring(ReconnBuffer *self) {
   unsigned char start = self->items[self->count - 1].start;
   unsigned short size =
       self->items[self->count - 1].stop - self->items[self->count - 1].start;
@@ -324,10 +365,12 @@ void reconn_buffer_pop_cstring(ReconnBuffer *self, char *dest) {
   self->end -= size;
   self->count -= 1;
 
-  memcpy(dest, location, size);
+  char *result = malloc(size);
+  memcpy(result, location, size);
+  return result;
 }
 
-void reconn_buffer_pop_string(ReconnBuffer *self, char *dest) {
+char *reconn_buffer_pop_string(ReconnBuffer *self) {
   unsigned char start = self->items[self->count - 1].start;
   unsigned short size =
       self->items[self->count - 1].stop - self->items[self->count - 1].start;
@@ -336,7 +379,14 @@ void reconn_buffer_pop_string(ReconnBuffer *self, char *dest) {
   self->end -= size;
   self->count -= 1;
 
-  memcpy(dest, location, size);
+  char *result = malloc(size);
+  memcpy(result, location, size);
+  return result;
+}
+
+unsigned long reconn_buffer_pop_wordp(ReconnBuffer *self) {
+  unsigned long *location = (unsigned long *)reconn_buffer_pop_void(self);
+  return *location & ULONG_MAX;
 }
 
 /*

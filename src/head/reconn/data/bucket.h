@@ -16,8 +16,22 @@ typedef struct ReconnBucket {
 } ReconnBucket;
 
 void reconn_element_free(ReconnBucketItem *self, int free_self) {
-  // free(self->data);
+  switch (self->kind) {
+  case RECONN_VALUE_WORD_BUFFER:
+    reconn_buffer_free((ReconnBuffer *)self->data, 1);
+    break;
+
+  case RECONN_VALUE_POINTER:
+  case RECONN_VALUE_WORD_PRIMARY:
+    break;
+
+  default:
+    // printf("FREE>%i<\n", self->kind);
+    free(self->data);
+    break;
+  }
   free(self->id);
+
   if (free_self)
     free(self);
 }
@@ -69,19 +83,19 @@ size_t reconn_bucket_find(ReconnBucket *self, const char *id) {
   return 0;
 }
 
-size_t reconn_bucket_add(ReconnBucket *self, void *data, const char *id) {
+size_t reconn_bucket_add(ReconnBucket *self, void *data, const char *id,
+                         ReconnValueKind kind) {
   size_t index = reconn_bucket_first_free(self);
   if (index) {
     self->cells[index].data = data;
-    self->cells[index].kind = RECONN_VALUE_POINTER;
+    self->cells[index].kind = kind;
 
     size_t len = strlen(id);
     self->cells[index].id = (char *)realloc(self->cells[index].id, len + 1);
     strncpy(self->cells[index].id, id, len + 1);
 
   } else {
-    stb_sb_push(self->cells,
-                reconn_makeBucketItem(data, RECONN_VALUE_POINTER, id));
+    stb_sb_push(self->cells, reconn_makeBucketItem(data, kind, id));
     index = stb_sb_count(self->cells) - 1;
   }
   return index;
@@ -89,6 +103,10 @@ size_t reconn_bucket_add(ReconnBucket *self, void *data, const char *id) {
 
 void *reconn_bucket_findv(ReconnBucket *self, const char *id) {
   size_t index = reconn_bucket_find(self, id);
+  return self->cells[index].data;
+}
+
+void *reconn_bucket_get(ReconnBucket *self, size_t index) {
   return self->cells[index].data;
 }
 

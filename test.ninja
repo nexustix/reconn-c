@@ -19,11 +19,9 @@ build build/demo/exe/demo.exe: c_exe build/demo/o/demo.o
 
 c_flags = $c_flags $c_flags_debug -I src/head -I trd/include
 
-build rcn_stack_o: phony build/stack/o/stack.o
-  c_flags = $c_flags_fast
 
 build rcn_demo: phony build/demo/exe/demo.exe
   c_flags = $c_flags_debug
 
-default rcn_stack_o rcn_demo
+default rcn_demo
 

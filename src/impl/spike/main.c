@@ -23,6 +23,14 @@ void tbd() {
   reconn_buffer_push_f32(&stack, 0x0451);
   reconn_buffer_push_f64(&stack, 0x0451);
 
+  reconn_buffer_push_string(&stack,
+                            "the quick brown fox jumps over the lazy dog", 43);
+  reconn_buffer_push_cstring(&stack,
+                             "the quick brown fox jumps over the lazy dog");
+
+  free(reconn_buffer_pop_cstring(&stack));
+  free(reconn_buffer_pop_string(&stack));
+
   // reconn_stack_print(&stack);
 
   assert(reconn_buffer_pop_f64(&stack) == 0x0451);
@@ -53,10 +61,21 @@ int main() {
 
   reconn_vm_add_primary(&vm, "hello", say_hello);
   reconn_vm_enter_namespace(&vm, "apha");
+  // reconn_vm_add_primary(&vm, "hello", say_hello);
+  reconn_vm_compile_append(&vm, "hello");
+  reconn_vm_compile_append(&vm, "hello");
+  reconn_vm_compile_append(&vm, "hello");
+  reconn_vm_add_secondary(&vm, "cheese");
+  reconn_vm_add_secondary(&vm, "foo");
+  reconn_vm_add_secondary(&vm, "bar");
   reconn_vm_enter_namespace(&vm, "beta");
-  reconn_vm_do_token(&vm, "hello");
+  // reconn_vm_do_token(&vm, "hello");
+  reconn_vm_do_token(&vm, "cheese");
 
-  reconn_vm_free(&vm);
+  while (reconn_vm_tick(&vm))
+    ;
+
+  reconn_vm_free(&vm, 0);
 
   /*
   ReconnVM vm = reconn_makeVM();
