@@ -1,7 +1,10 @@
 //#include "reconn/data/bucket.h"
 #include "reconn/data/buffer.h"
-//#include "reconn/data/stack.h"
-#include "reconn/data/value.h"
+#include "reconn/data/buffer_float.h"
+#include "reconn/data/buffer_int.h"
+#include "reconn/data/buffer_string.h"
+#include "reconn/data/number.h"
+//#include "reconn/data/value.h"
 #include "reconn/parse.h"
 #include "reconn/vm.h"
 #include <assert.h>
@@ -24,13 +27,16 @@ void tbd() {
   reconn_buffer_push_f32(&stack, 0x0451);
   reconn_buffer_push_f64(&stack, 0x0451);
 
-  reconn_buffer_push_string(&stack,
-                            "the quick brown fox jumps over the lazy dog", 43);
+  reconn_buffer_push_bytestring(
+      &stack, "the quick brown fox jumps over the lazy dog", 43);
   reconn_buffer_push_cstring(&stack,
                              "the quick brown fox jumps over the lazy dog");
 
+  // char *str = reconn_buffer_pop_cstring(&stack);
+  // printf(">%s<", str);
+  // free(str);
   free(reconn_buffer_pop_cstring(&stack));
-  free(reconn_buffer_pop_string(&stack));
+  free(reconn_buffer_pop_bytestring(&stack));
 
   // reconn_stack_print(&stack);
 
@@ -48,11 +54,6 @@ void tbd() {
   assert(reconn_buffer_pop_u8(&stack) == UCHAR_MAX);
 
   reconn_buffer_free(&stack, 0);
-}
-
-int say_hello(ReconnVM *vm) {
-  printf("HELLO THERE\n");
-  return 0;
 }
 
 void repl(ReconnVM *vm) {
@@ -85,69 +86,40 @@ void repl(ReconnVM *vm) {
   free(data);
 }
 
+int say_hello(ReconnVM *vm) {
+  printf("HELLO THERE\n");
+  return 0;
+}
+
+int x_stack(ReconnVM *vm) {
+  reconn_buffer_print(&vm->value_stack);
+  return 0;
+}
+
+int x_stop(ReconnVM *vm) {
+  vm->running = 0;
+  return 0;
+}
+
 int main() {
   tbd();
+  /*
+  ReconnNumber num_a = reconn_makeNumber(12304510000, 6);
+  ReconnNumber num_b = reconn_makeNumber(12351000000, 6);
+  ReconnNumber num_c = reconn_number_from_double(1234234223.99);
+  double d_c = reconn_number_to_double(&num_c);
+
+
+  reconn_number_print(&num_a);
+  reconn_number_print(&num_b);
+  reconn_number_print(&num_c);
+  printf("%lf\n", d_c);
+  */
 
   ReconnVM vm = reconn_makeVM();
-
   reconn_vm_add_primary(&vm, "hello", say_hello);
-
+  reconn_vm_add_primary(&vm, "stack", x_stack);
+  reconn_vm_add_primary(&vm, "bye", x_stop);
   repl(&vm);
-
   reconn_vm_free(&vm, 0);
-
-  // reconn_parse_tokens("the cake is a lie \"oh yes\" you know \"the cake\" ",
-  //                    &inputBuffer);
-  //
-  // reconn_buffer_print(&inputBuffer);
-
-  /*
-  ReconnVM vm = reconn_makeVM();
-
-  reconn_vm_add_primary(&vm, "hello", say_hello);
-  reconn_vm_enter_namespace(&vm, "apha");
-  // reconn_vm_add_primary(&vm, "hello", say_hello);
-  reconn_vm_compile_append(&vm, "hello");
-  reconn_vm_compile_append(&vm, "hello");
-  reconn_vm_compile_append(&vm, "hello");
-  reconn_vm_add_secondary(&vm, "cheese");
-  reconn_vm_add_secondary(&vm, "foo");
-  reconn_vm_add_secondary(&vm, "bar");
-  reconn_vm_enter_namespace(&vm, "beta");
-  // reconn_vm_do_token(&vm, "hello");
-  reconn_vm_do_token(&vm, "cheese");
-
-  while (reconn_vm_tick(&vm))
-    ;
-
-  reconn_vm_free(&vm, 0);
-  */
-
-  /*
-  ReconnVM vm = reconn_makeVM();
-
-  reconn_vm_enter_namespace(&vm, "alpha");
-  reconn_vm_enter_namespace(&vm, "beta");
-  reconn_vm_enter_namespace(&vm, "gamma");
-  reconn_vm_enter_namespace(&vm, "delta");
-  reconn_vm_enter_namespace(&vm, "epsilon");
-  char *cake = reconn_vm_namespace_token(&vm, "bake", 5);
-  // char *cake = reconn_vm_namespace_fragment(&vm, 1);
-  printf(">%s<\n", cake);
-  printf(">%lu<\n", reconn_vm_namespace_depth(&vm));
-
-  reconn_vm_namespace_fragment(&vm, 1);
-  */
-
-  /*
-  ReconnBucket bucket = reconn_makeBucket();
-
-  int bestval = 451;
-
-  reconn_bucket_add(&bucket, &bestval, "toast");
-
-  int *fuu = reconn_bucket_get(&bucket, "toast");
-
-  printf(">%i<\n", *fuu);
-  */
 }

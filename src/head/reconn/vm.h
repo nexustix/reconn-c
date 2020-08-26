@@ -4,6 +4,8 @@
 #include "data/bucket.h"
 //#include "data/stack.h"
 #include "data/buffer.h"
+#include "data/buffer_string.h"
+#include "data/ducktype.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +32,7 @@ typedef struct ReconnVM {
 
   // TBD
   int running;
+  int got_error;
 
 } ReconnVM;
 
@@ -47,8 +50,9 @@ ReconnVM reconn_makeVM() {
 
   self.ndepth = 0;
   self.running = 1;
+  self.got_error = 0;
   // push null
-  reconn_buffer_push_string(&self.namespace_stack, "\0", 1);
+  reconn_buffer_push_bytestring(&self.namespace_stack, "\0", 1);
   return self;
 }
 
@@ -105,18 +109,18 @@ void reconn_vm_enter_namespace(ReconnVM *self, char *nspace) {
     // pop null
     reconn_buffer_pop_void(&self->namespace_stack);
     // push string
-    reconn_buffer_push_string(&self->namespace_stack, nspace, length);
+    reconn_buffer_push_bytestring(&self->namespace_stack, nspace, length);
     // push null
-    reconn_buffer_push_string(&self->namespace_stack, "\0", 1);
+    reconn_buffer_push_bytestring(&self->namespace_stack, "\0", 1);
   } else if (count >= 2) {
     // pop null
     reconn_buffer_pop_void(&self->namespace_stack);
     // push seperator
-    reconn_buffer_push_string(&self->namespace_stack, ".", 1);
+    reconn_buffer_push_bytestring(&self->namespace_stack, ".", 1);
     // push namespace
-    reconn_buffer_push_string(&self->namespace_stack, nspace, length);
+    reconn_buffer_push_bytestring(&self->namespace_stack, nspace, length);
     // push null
-    reconn_buffer_push_string(&self->namespace_stack, "\0", 1);
+    reconn_buffer_push_bytestring(&self->namespace_stack, "\0", 1);
   } else {
     assert(0);
   }
@@ -132,7 +136,7 @@ void reconn_vm_leave_namespace(ReconnVM *self) {
     // pop namespace
     reconn_buffer_pop_void(&self->namespace_stack);
     // push null
-    reconn_buffer_push_string(&self->namespace_stack, "\0", 1);
+    reconn_buffer_push_bytestring(&self->namespace_stack, "\0", 1);
   } else if (count > 2) {
     // pop null
     reconn_buffer_pop_void(&self->namespace_stack);
@@ -141,7 +145,7 @@ void reconn_vm_leave_namespace(ReconnVM *self) {
     // pop seperator
     reconn_buffer_pop_void(&self->namespace_stack);
     // push null
-    reconn_buffer_push_string(&self->namespace_stack, "\0", 1);
+    reconn_buffer_push_bytestring(&self->namespace_stack, "\0", 1);
   } else {
     assert(0);
   }
@@ -230,7 +234,8 @@ void reconn_vm_add_primary(ReconnVM *self, const char *token,
 int reconn_vm_try_primary(ReconnVM *self, const char *token) {
   for (long d = self->ndepth; d >= 0; d--) {
     char *ntoken = reconn_vm_namespace_token(self, token, d);
-    int (*fun)(ReconnVM *) = reconn_bucket_findv(&self->primary_words, ntoken);
+    int (*fun)(ReconnVM *) =
+        (int (*)(ReconnVM *))reconn_bucket_findv(&self->primary_words, ntoken);
     if (fun) {
       // printf(">%s<FOUND PRIMARY!!!\n", ntoken);
       fun(self);
@@ -248,7 +253,8 @@ int reconn_vm_try_primary(ReconnVM *self, const char *token) {
 int reconn_vm_try_secondary(ReconnVM *self, const char *token) {
   for (long d = self->ndepth; d >= 0; d--) {
     char *ntoken = reconn_vm_namespace_token(self, token, d);
-    ReconnBuffer *buffer = reconn_bucket_findv(&self->secondary_words, ntoken);
+    ReconnBuffer *buffer =
+        (ReconnBuffer *)reconn_bucket_findv(&self->secondary_words, ntoken);
     if (buffer) {
       // printf(">%s<FOUND SECONDARY!!!\n", ntoken);
       for (long i = buffer->count - 1; i >= 0; i--) {
@@ -279,11 +285,14 @@ int reconn_vm_do_token(ReconnVM *self, const char *token) {
     return 1;
   } else if (reconn_vm_try_secondary(self, token)) {
     return 1;
+  } else if (reconn_ducktype_as_whatever(&self->value_stack, token)) {
+    return 1;
   }
   return 0;
 }
 
 int reconn_vm_tick(ReconnVM *self) {
+  self->got_error = 0;
   if (self->run_stack.count) {
     char *next_token = reconn_buffer_pop_cstring(&self->run_stack);
 
@@ -293,7 +302,7 @@ int reconn_vm_tick(ReconnVM *self) {
     } else {
       printf("<!> unable to handle token >%s<\n", next_token);
       free(next_token);
-      self->running = 0;
+      self->got_error = 1;
       return 0;
     }
   }
