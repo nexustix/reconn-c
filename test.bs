@@ -1,6 +1,7 @@
 head
 
-c_flags_fast = -Wall -Werror -march=native -g0 -O2
+#c_flags_fast = -Wall -Werror -march=native -g0 -O3
+c_flags_fast = -Wall -march=native -g0 -O3
 c_flags_debug = -Wall -Werror -g
 c_flags =
 c_compiler = gcc
@@ -19,6 +20,7 @@ leave
 tail
 
 c_flags = $c_flags $c_flags_debug -I src/head -I trd/include
+#c_flags = $c_flags $c_flags_fast -I src/head -I trd/include
 
 #build rcn_stack_o: phony build/stack/o/stack.o
 #  c_flags = $c_flags_fast

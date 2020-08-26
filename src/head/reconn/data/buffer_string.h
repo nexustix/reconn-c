@@ -29,26 +29,6 @@ GETTING ITEMS
 =============
 */
 
-/*
-char *reconn_buffer_get_cstring(ReconnBuffer *self, size_t index) {
-  unsigned char start = self->items[index].start;
-  unsigned short size = self->items[index].stop - self->items[index].start;
-  char *location = (char *)&self->data[start];
-  char *result = (char *)malloc(size);
-  memcpy(result, location, size);
-  return result;
-}
-
-char *reconn_buffer_get_string(ReconnBuffer *self, size_t index) {
-  unsigned char start = self->items[index].start;
-  unsigned short size = self->items[index].stop - self->items[index].start;
-  char *location = (char *)&self->data[start];
-  char *result = (char *)malloc(size);
-  memcpy(result, location, size);
-  return result;
-}
-*/
-
 char *reconn_buffer_get_cstring(ReconnBuffer *self, size_t index) {
   // const size_t start = self->items[index].start;
   const size_t size = self->items[index].stop - self->items[index].start;
@@ -73,35 +53,6 @@ POPPING ITEMS
 =============
 */
 
-/*
-char *reconn_buffer_pop_cstring(ReconnBuffer *self) {
-  unsigned char start = self->items[self->count - 1].start;
-  unsigned short size =
-      self->items[self->count - 1].stop - self->items[self->count - 1].start;
-  char *location = (char *)&self->data[start];
-
-  self->end -= size;
-  self->count -= 1;
-
-  char *result = (char *)malloc(size);
-  memcpy(result, location, size);
-  return result;
-}
-
-char *reconn_buffer_pop_string(ReconnBuffer *self) {
-  unsigned char start = self->items[self->count - 1].start;
-  unsigned short size =
-      self->items[self->count - 1].stop - self->items[self->count - 1].start;
-  double *location = (double *)&self->data[start];
-
-  self->end -= size;
-  self->count -= 1;
-
-  char *result = (char *)malloc(size);
-  memcpy(result, location, size);
-  return result;
-}
-*/
 char *reconn_buffer_pop_cstring(ReconnBuffer *self) {
   const size_t size =
       self->items[self->count - 1].stop - self->items[self->count - 1].start;

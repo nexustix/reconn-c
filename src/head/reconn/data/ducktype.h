@@ -31,7 +31,8 @@ int reconn_ducktype_as_string(ReconnBuffer *buffer, const char *token,
         return 1;
       } else {
         // char *result = (char *)malloc(length - 2);
-        strncpy(result, token + 1, length - 2);
+        // strncpy(result, token + 1, length - 2);
+        memcpy(result, token + 1, length - 2);
         // result[length] = 0;
         // printf("A >%lu< >%s<\n", length, result);
         // rcn_element_set_cstring(e, result);
@@ -40,7 +41,8 @@ int reconn_ducktype_as_string(ReconnBuffer *buffer, const char *token,
         return 1;
       }
     } else {
-      strncpy(result, token, length);
+      // strncpy(result, token, length);
+      memcpy(result, token, length);
       // printf("B >%s<\n", result);
       // rcn_element_set_cstring(e, result);
       reconn_buffer_push_cstring(buffer, result);
@@ -68,7 +70,8 @@ int reconn_ducktype_as_quote(ReconnBuffer *buffer, const char *token,
         free(result);
         return 1;
       } else {
-        strncpy(result, token + 1, length + 2);
+        // strncpy(result, token + 1, length + 2);
+        memcpy(result, token + 1, length + 2);
         // printf("C %s<\n", result);
         // rcn_element_set_cstring(e, result);
         reconn_buffer_push_cstring(buffer, result);
@@ -76,7 +79,8 @@ int reconn_ducktype_as_quote(ReconnBuffer *buffer, const char *token,
         return 1;
       }
     } else {
-      strncpy(result, token, length);
+      // strncpy(result, token, length);
+      memcpy(result, token, length);
       // printf("D >%s<\n", result);
       // rcn_element_set_cstring(e, result);
       reconn_buffer_push_cstring(buffer, result);

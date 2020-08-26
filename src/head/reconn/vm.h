@@ -156,15 +156,16 @@ void reconn_vm_leave_namespace(ReconnVM *self) {
 // get fragment of namespace at given level/depth
 char *reconn_vm_namespace_fragment(ReconnVM *self, size_t level) {
   const char *nspace = reconn_vm_get_namespace(self);
-  size_t len = strlen(nspace);
-  size_t depth = self->ndepth;
+  const size_t len = strlen(nspace);
+  const size_t depth = self->ndepth;
   char sep = '.';
   char *fragment = (char *)calloc(1, len + 1);
   assert(level <= depth);
 
   if (level == 0) {
   } else if (depth == 1 || depth == level) {
-    strncpy(fragment, nspace, len);
+    // strncpy(fragment, nspace, len);
+    memcpy(fragment, nspace, len);
   } else {
     size_t sep_count = 0;
     for (size_t i = 0; i < len; i++) {
@@ -172,7 +173,8 @@ char *reconn_vm_namespace_fragment(ReconnVM *self, size_t level) {
         sep_count += 1;
       }
       if (sep_count >= level) {
-        strncpy(fragment, nspace, i);
+        // strncpy(fragment, nspace, i);
+        memcpy(fragment, nspace, i);
         break;
       }
     }

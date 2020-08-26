@@ -53,7 +53,8 @@ ReconnBucketItem reconn_makeBucketItem(void *data, ReconnValueKind kind,
 
   size_t len = strlen(id);
   self.id = (char *)malloc(len + 1);
-  strncpy(self.id, id, len + 1);
+  // strncpy(self.id, id, len + 1);
+  memcpy(self.id, id, len + 1);
   return self;
 }
 
@@ -92,7 +93,8 @@ size_t reconn_bucket_add(ReconnBucket *self, void *data, const char *id,
 
     size_t len = strlen(id);
     self->cells[index].id = (char *)realloc(self->cells[index].id, len + 1);
-    strncpy(self->cells[index].id, id, len + 1);
+    // strncpy(self->cells[index].id, id, len + 1);
+    memcpy(self->cells[index].id, id, len + 1);
 
   } else {
     stb_sb_push(self->cells, reconn_makeBucketItem(data, kind, id));

@@ -18,7 +18,9 @@ typedef struct ReconnBuffer {
   // number of items in buffer
   size_t count;
   // amount of space reserved for each pointer
-  size_t reserved;
+  // size_t reserved;
+  size_t reserve_data;
+  size_t reserve_meta;
   size_t lasti;
   unsigned char *data;
   ReconnBufferItem *items;
@@ -33,12 +35,15 @@ void reconn_buffer_free(ReconnBuffer *self, int free_self) {
 
 ReconnBuffer reconn_makeBuffer() {
   ReconnBuffer self;
-  size_t start_reserve = sizeof(ReconnBufferItem);
+  // size_t start_reserve = sizeof(ReconnBufferItem);
+  self.reserve_data = 16;
+  self.reserve_meta = 16;
   self.end = 0;
   self.count = 0;
-  self.data = (unsigned char *)malloc(start_reserve);
-  self.items = (ReconnBufferItem *)malloc(start_reserve);
-  self.reserved = start_reserve;
+  self.data = (unsigned char *)malloc(self.reserve_data);
+  self.items = (ReconnBufferItem *)malloc(self.reserve_meta);
+  // self.reserved = start_reserve;
+
   self.lasti = 0;
   return self;
 }
@@ -61,6 +66,7 @@ void reconn_buffer_print(ReconnBuffer *self) {
   }
 }
 
+/*
 // ensure each pointer has atleast "minsize" amount of reserved space
 void reconn_buffer_resize(ReconnBuffer *self, size_t minsize) {
   // FIXME doesn't handle running out of memory
@@ -72,10 +78,35 @@ void reconn_buffer_resize(ReconnBuffer *self, size_t minsize) {
     self->reserved = newsize;
   }
 }
+*/
+
+void reconn_buffer_resize_data(ReconnBuffer *self, size_t minsize) {
+  // FIXME doesn't handle running out of memory
+  while (self->reserve_data < minsize) {
+    size_t newsize = self->reserve_data * 2;
+    self->data = (unsigned char *)realloc(self->data, newsize);
+    // self->items = (ReconnBufferItem *)realloc(self->items, newsize);
+
+    self->reserve_data = newsize;
+  }
+}
+
+void reconn_buffer_resize_meta(ReconnBuffer *self, size_t minsize) {
+  // FIXME doesn't handle running out of memory
+  while (self->reserve_meta < minsize) {
+    size_t newsize = self->reserve_meta * 2;
+    // self->data = (unsigned char *)realloc(self->data, newsize);
+    self->items = (ReconnBufferItem *)realloc(self->items, newsize);
+
+    self->reserve_meta = newsize;
+  }
+}
 
 void reconn_buffer_grow_for(ReconnBuffer *self, size_t index, size_t size) {
-  reconn_buffer_resize(self, sizeof(ReconnBufferItem) * (index + 1));
-  reconn_buffer_resize(self, self->end + size);
+  // reconn_buffer_resize(self, sizeof(ReconnBufferItem) * (index + 1));
+  // reconn_buffer_resize(self, self->end + size);
+  reconn_buffer_resize_data(self, self->end + size);
+  reconn_buffer_resize_meta(self, sizeof(ReconnBufferItem) * (index + 1));
 }
 
 /*
