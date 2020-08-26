@@ -55,6 +55,7 @@ int reconn_ducktype_as_string(ReconnBuffer *buffer, const char *token,
   return 0;
 };
 
+/*
 // TODO rewrite
 int reconn_ducktype_as_quote(ReconnBuffer *buffer, const char *token,
                              int remove_quotes) {
@@ -88,6 +89,22 @@ int reconn_ducktype_as_quote(ReconnBuffer *buffer, const char *token,
       return 1;
     }
     // free(e);
+  }
+  free(result);
+  return 0;
+}
+*/
+
+// TODO rewrite
+int reconn_ducktype_as_quote(ReconnBuffer *buffer, const char *token) {
+  size_t length = strlen(token) + 1;
+  char *result = (char *)calloc(1, length);
+
+  if (length > 1 && token[0] == ':') {
+    memcpy(result, token + 1, length - 2);
+    reconn_buffer_push_cstring(buffer, result);
+    free(result);
+    return 1;
   }
   free(result);
   return 0;
@@ -177,7 +194,7 @@ int reconn_ducktype_as_double(ReconnBuffer *buffer, const char *token) {
 // double
 
 int reconn_ducktype_as_whatever(ReconnBuffer *buffer, const char *token) {
-  return reconn_ducktype_as_quote(buffer, token, 1) ||
+  return reconn_ducktype_as_quote(buffer, token) ||
          reconn_ducktype_as_string(buffer, token, 1) ||
          reconn_ducktype_as_int(buffer, token, 10) ||
          reconn_ducktype_as_double(buffer, token);

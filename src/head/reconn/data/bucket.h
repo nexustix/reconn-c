@@ -23,6 +23,7 @@ void reconn_element_free(ReconnBucketItem *self, int free_self) {
 
   case RECONN_VALUE_POINTER:
   case RECONN_VALUE_WORD_PRIMARY:
+  case RECONN_VALUE_WORD_COMPILE:
     break;
 
   default:

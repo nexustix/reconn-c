@@ -193,4 +193,24 @@ ReconnValueKind reconn_buffer_kind_at(ReconnBuffer *self, unsigned char index) {
   return self->items[index].kind;
 }
 
+void reconn_buffer_reset(ReconnBuffer *self) {
+  self->count = 0;
+  self->end = 0;
+  self->lasti = 0;
+}
+
+void reconn_buffer_pprint(ReconnBuffer *self) {
+  printf("<top> ");
+  for (int i = 0; i < self->count; i++) {
+    const int ldepth = self->count - i - 1;
+    ReconnValueKind kind = reconn_buffer_kind_at(self, ldepth);
+    const void *value = reconn_buffer_get_void(self, ldepth);
+    const char *kind_str = reconn_value_kind_to_string(kind);
+    char *value_str = reconn_value_value_to_string(kind, value);
+    printf("%i:[%s](%s) ", i, value_str, kind_str);
+    free(value_str);
+  }
+  printf("<bottom>\n");
+}
+
 #endif

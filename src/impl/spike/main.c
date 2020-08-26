@@ -92,7 +92,8 @@ int say_hello(ReconnVM *vm) {
 }
 
 int x_stack(ReconnVM *vm) {
-  reconn_buffer_print(&vm->value_stack);
+  // reconn_buffer_print(&vm->value_stack);
+  reconn_buffer_pprint(&vm->value_stack);
   return 0;
 }
 
@@ -101,8 +102,33 @@ int x_stop(ReconnVM *vm) {
   return 0;
 }
 
+int pcompile_start(ReconnVM *vm) {
+  vm->compile = 1;
+  reconn_buffer_reset(&vm->compile_buffer);
+
+  return 0;
+}
+
+int ccompile_stop(ReconnVM *vm) {
+  vm->compile = 0;
+  return 0;
+}
+
+int pdef(ReconnVM *vm) {
+  assert(reconn_buffer_count(&vm->value_stack) > 0);
+  char *name = reconn_buffer_pop_cstring(&vm->value_stack);
+  reconn_vm_add_secondary(vm, name);
+  vm->compile = 0;
+  free(name);
+  return 0;
+}
+
 int main() {
   tbd();
+
+  const char *cake = reconn_value_kind_to_string(RECONN_VALUE_S64);
+  printf("%s\n", cake);
+
   /*
   ReconnNumber num_a = reconn_makeNumber(12304510000, 6);
   ReconnNumber num_b = reconn_makeNumber(12351000000, 6);
@@ -120,6 +146,11 @@ int main() {
   reconn_vm_add_primary(&vm, "hello", say_hello);
   reconn_vm_add_primary(&vm, "stack", x_stack);
   reconn_vm_add_primary(&vm, "bye", x_stop);
+
+  reconn_vm_add_primary(&vm, "[", pcompile_start);
+  reconn_vm_add_compile(&vm, "]", ccompile_stop);
+  reconn_vm_add_primary(&vm, "def", pdef);
+
   repl(&vm);
   reconn_vm_free(&vm, 0);
 }

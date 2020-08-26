@@ -21,6 +21,8 @@ typedef struct ReconnVM {
   ReconnBuffer namespace_stack;
   // primary words
   ReconnBucket primary_words;
+  // compile words
+  ReconnBucket compile_words;
   // secondary words
   ReconnBucket secondary_words;
 
@@ -33,6 +35,9 @@ typedef struct ReconnVM {
   // TBD
   int running;
   int got_error;
+  int compile;
+
+  int comment;
 
 } ReconnVM;
 
@@ -45,12 +50,15 @@ ReconnVM reconn_makeVM() {
 
   self.primary_words = reconn_makeBucket();
   self.secondary_words = reconn_makeBucket();
+  self.compile_words = reconn_makeBucket();
 
   self.compile_buffer = reconn_makeBuffer();
 
   self.ndepth = 0;
   self.running = 1;
   self.got_error = 0;
+  self.compile = 0;
+  self.comment = 0;
   // push null
   reconn_buffer_push_bytestring(&self.namespace_stack, "\0", 1);
   return self;
@@ -65,6 +73,7 @@ void reconn_vm_free(ReconnVM *self, int free_self) {
 
   reconn_bucket_free(&self->primary_words, 0);
   reconn_bucket_free(&self->secondary_words, 0);
+  reconn_bucket_free(&self->compile_words, 0);
 
   reconn_buffer_free(&self->compile_buffer, 0);
   if (free_self)
@@ -233,6 +242,33 @@ void reconn_vm_add_primary(ReconnVM *self, const char *token,
   free(ntoken);
 }
 
+void reconn_vm_add_compile(ReconnVM *self, const char *token,
+                           int (*callback)(ReconnVM *)) {
+  char *ntoken = reconn_vm_namespace_token(self, token, self->ndepth);
+  reconn_bucket_add(&self->compile_words, callback, ntoken,
+                    RECONN_VALUE_WORD_COMPILE);
+  free(ntoken);
+}
+
+int reconn_vm_try_compile(ReconnVM *self, const char *token) {
+  for (long d = self->ndepth; d >= 0; d--) {
+    char *ntoken = reconn_vm_namespace_token(self, token, d);
+    int (*fun)(ReconnVM *) =
+        (int (*)(ReconnVM *))reconn_bucket_findv(&self->compile_words, ntoken);
+    if (fun) {
+      // printf(">%s<FOUND COMPILE!!!\n", ntoken);
+      fun(self);
+      free(ntoken);
+      return 1;
+    }
+    // else {
+    // printf(">%s<nope compile\n", ntoken);
+    //}
+    free(ntoken);
+  }
+  return 0;
+}
+
 int reconn_vm_try_primary(ReconnVM *self, const char *token) {
   for (long d = self->ndepth; d >= 0; d--) {
     char *ntoken = reconn_vm_namespace_token(self, token, d);
@@ -261,7 +297,7 @@ int reconn_vm_try_secondary(ReconnVM *self, const char *token) {
       // printf(">%s<FOUND SECONDARY!!!\n", ntoken);
       for (long i = buffer->count - 1; i >= 0; i--) {
         char *subtoken = reconn_buffer_get_cstring(buffer, i);
-        printf("'pushing'>%s<\n", subtoken);
+        // printf("'pushing'>%s<\n", subtoken);
         reconn_buffer_push_cstring(&self->run_stack, subtoken);
         free(subtoken);
       }
@@ -283,11 +319,34 @@ TOKENS
 */
 
 int reconn_vm_do_token(ReconnVM *self, const char *token) {
-  if (reconn_vm_try_primary(self, token)) {
+
+  if (strcmp(token, "(") == 0) {
+    self->comment += 1;
     return 1;
-  } else if (reconn_vm_try_secondary(self, token)) {
+  } else if (strcmp(token, ")") == 0) {
+    self->comment -= 1;
+    assert(self->comment >= 0);
     return 1;
-  } else if (reconn_ducktype_as_whatever(&self->value_stack, token)) {
+  }
+
+  if (!self->comment) {
+    if (!self->compile) {
+      if (reconn_vm_try_primary(self, token)) {
+        return 1;
+      } else if (reconn_vm_try_secondary(self, token)) {
+        return 1;
+      } else if (reconn_ducktype_as_whatever(&self->value_stack, token)) {
+        return 1;
+      }
+    } else {
+      if (reconn_vm_try_compile(self, token)) {
+        return 1;
+      } else {
+        reconn_vm_compile_append(self, token);
+        return 1;
+      }
+    }
+  } else {
     return 1;
   }
   return 0;
