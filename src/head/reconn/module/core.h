@@ -22,7 +22,10 @@ int reconn_mod_core_cstop(ReconnVM *vm) {
 }
 
 int reconn_mod_core_pdef(ReconnVM *vm) {
-  assert(reconn_buffer_count(&vm->value_stack) > 0);
+  if (!(reconn_buffer_count(&vm->value_stack) > 0)) {
+    vm->got_error = 1;
+    return -1;
+  }
   char *name = reconn_buffer_pop_cstring(&vm->value_stack);
   reconn_vm_add_secondary(vm, name);
   vm->compile = 0;
@@ -42,7 +45,10 @@ int reconn_mod_core_pstop(ReconnVM *vm) {
 }
 
 int reconn_mod_core_penter(ReconnVM *vm) {
-  assert(reconn_buffer_count(&vm->value_stack) > 0);
+  if (!(reconn_buffer_count(&vm->value_stack) > 0)) {
+    vm->got_error = 1;
+    return -1;
+  }
   char *name = reconn_buffer_pop_cstring(&vm->value_stack);
   reconn_vm_enter_namespace(vm, name);
   free(name);
@@ -61,7 +67,10 @@ int reconn_mod_core_peleave(ReconnVM *vm) {
 int reconn_mod_core_pnop(ReconnVM *vm) { return 0; }
 
 int reconn_mod_core_pdo(ReconnVM *vm) {
-  assert(reconn_buffer_count(&vm->value_stack) > 0);
+  if (!(reconn_buffer_count(&vm->value_stack) > 0)) {
+    vm->got_error = 1;
+    return -1;
+  }
   char *name = reconn_buffer_pop_cstring(&vm->value_stack);
   reconn_vm_do_token(vm, name);
   free(name);

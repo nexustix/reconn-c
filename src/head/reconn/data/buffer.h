@@ -189,9 +189,17 @@ UTILLITY FUNCTIONS
 
 unsigned char reconn_buffer_count(ReconnBuffer *self) { return self->count; }
 
-ReconnValueKind reconn_buffer_kind_at(ReconnBuffer *self, unsigned char index) {
-  return self->items[index].kind;
+ReconnValueKind reconn_buffer_kind_at(ReconnBuffer *self, int index) {
+  if (index < 0) {
+    return self->items[self->count + index].kind;
+  } else {
+    return self->items[index].kind;
+  }
 }
+
+// ReconnValueKind reconn_buffer_kind_top(ReconnBuffer *self) {
+//  return self->items[self->lasti].kind;
+//}
 
 void reconn_buffer_reset(ReconnBuffer *self) {
   self->count = 0;

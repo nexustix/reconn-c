@@ -312,4 +312,419 @@ int reconn_value_is_true(ReconnValueKind kind, const void *value) {
   }
 }
 
+ReconnValueKind reconn_value_find_compromise(ReconnValueKind kinda,
+                                             ReconnValueKind kindb) {
+  if (kinda == kindb) {
+    return kinda;
+  }
+
+  switch (kinda) {
+  case RECONN_VALUE_U8:
+    switch (kindb) {
+    case RECONN_VALUE_U16:
+    case RECONN_VALUE_U32:
+    case RECONN_VALUE_U64:
+      return kindb;
+      break;
+    case RECONN_VALUE_S8:
+      return RECONN_VALUE_S16;
+      break;
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+    case RECONN_VALUE_S64:
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_U16:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+      return RECONN_VALUE_U16;
+      break;
+    case RECONN_VALUE_U32:
+    case RECONN_VALUE_U64:
+      return kindb;
+      break;
+    case RECONN_VALUE_S8:
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+      return RECONN_VALUE_S32;
+      break;
+    case RECONN_VALUE_S64:
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_U32:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+    case RECONN_VALUE_U16:
+      return RECONN_VALUE_U32;
+      break;
+    case RECONN_VALUE_U64:
+      return RECONN_VALUE_U64;
+      break;
+    case RECONN_VALUE_S8:
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+    case RECONN_VALUE_S64:
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_U64:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+    case RECONN_VALUE_U16:
+    case RECONN_VALUE_U32:
+    case RECONN_VALUE_U64:
+      return RECONN_VALUE_U64;
+      break;
+    case RECONN_VALUE_S8:
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+    case RECONN_VALUE_S64:
+      // FIXME can lose data
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_S8:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+      return RECONN_VALUE_S16;
+      break;
+    case RECONN_VALUE_U16:
+      return RECONN_VALUE_S32;
+      break;
+    case RECONN_VALUE_U32:
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_U64:
+      // FIXME can lose data
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+    case RECONN_VALUE_S64:
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_S16:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+      return RECONN_VALUE_S16;
+      break;
+    case RECONN_VALUE_U16:
+      return RECONN_VALUE_S32;
+      break;
+    case RECONN_VALUE_U32:
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_U64:
+      // FIXME can lose data
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_S8:
+      return RECONN_VALUE_S16;
+      break;
+    case RECONN_VALUE_S32:
+    case RECONN_VALUE_S64:
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_S32:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+      return RECONN_VALUE_S32;
+      break;
+    case RECONN_VALUE_U16:
+      return RECONN_VALUE_S32;
+      break;
+    case RECONN_VALUE_U32:
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_U64:
+      // FIXME can lose data
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_S8:
+    case RECONN_VALUE_S16:
+      return RECONN_VALUE_S32;
+      break;
+    case RECONN_VALUE_S64:
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_S64:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+    case RECONN_VALUE_U16:
+    case RECONN_VALUE_U32:
+    case RECONN_VALUE_U64:
+      // FIXME can lose data
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_S8:
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+      return RECONN_VALUE_S64;
+      break;
+    case RECONN_VALUE_F32:
+    case RECONN_VALUE_F64:
+      return kindb;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_F32:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+    case RECONN_VALUE_U16:
+    case RECONN_VALUE_U32:
+    case RECONN_VALUE_U64:
+    case RECONN_VALUE_S8:
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+    case RECONN_VALUE_S64:
+      return RECONN_VALUE_F32;
+      break;
+    case RECONN_VALUE_F64:
+      return RECONN_VALUE_F64;
+      break;
+    default:
+      break;
+    }
+    break;
+  case RECONN_VALUE_F64:
+    switch (kindb) {
+    case RECONN_VALUE_U8:
+    case RECONN_VALUE_U16:
+    case RECONN_VALUE_U32:
+    case RECONN_VALUE_U64:
+    case RECONN_VALUE_S8:
+    case RECONN_VALUE_S16:
+    case RECONN_VALUE_S32:
+    case RECONN_VALUE_S64:
+    case RECONN_VALUE_F32:
+      return RECONN_VALUE_F64;
+      break;
+    default:
+      break;
+    }
+    break;
+  default:
+    break;
+  }
+  return RECONN_VALUE_VOID;
+}
+
+int reconn_value_is_number(ReconnValueKind kind) {
+  switch (kind) {
+  case RECONN_VALUE_U8:
+  case RECONN_VALUE_U16:
+  case RECONN_VALUE_U32:
+  case RECONN_VALUE_U64:
+  case RECONN_VALUE_S8:
+  case RECONN_VALUE_S16:
+  case RECONN_VALUE_S32:
+  case RECONN_VALUE_S64:
+  case RECONN_VALUE_F32:
+  case RECONN_VALUE_F64:
+    return 1;
+    break;
+  default:
+    return 0;
+    break;
+  }
+}
+
+int reconn_value_is_signed(ReconnValueKind kind) {
+  switch (kind) {
+  case RECONN_VALUE_S8:
+  case RECONN_VALUE_S16:
+  case RECONN_VALUE_S32:
+  case RECONN_VALUE_S64:
+    return 1;
+    break;
+  case RECONN_VALUE_U8:
+  case RECONN_VALUE_U16:
+  case RECONN_VALUE_U32:
+  case RECONN_VALUE_U64:
+  case RECONN_VALUE_F32:
+  case RECONN_VALUE_F64:
+  default:
+    return 0;
+    break;
+  }
+}
+
+int reconn_value_is_float(ReconnValueKind kind) {
+  switch (kind) {
+  case RECONN_VALUE_F32:
+  case RECONN_VALUE_F64:
+    return 1;
+    break;
+  case RECONN_VALUE_U8:
+  case RECONN_VALUE_U16:
+  case RECONN_VALUE_U32:
+  case RECONN_VALUE_U64:
+  case RECONN_VALUE_S8:
+  case RECONN_VALUE_S16:
+  case RECONN_VALUE_S32:
+  case RECONN_VALUE_S64:
+  default:
+    return 0;
+    break;
+  }
+}
+
+unsigned long long reconn_value_to_u64(ReconnValueKind kind,
+                                       const void *value) {
+  switch (kind) {
+  case RECONN_VALUE_U8:
+    return (unsigned long long)*(unsigned char *)value;
+    break;
+  case RECONN_VALUE_U16:
+    return (unsigned long long)*(unsigned short *)value;
+    break;
+  case RECONN_VALUE_U32:
+    return (unsigned long long)*(unsigned long *)value;
+    break;
+  case RECONN_VALUE_U64:
+    return (unsigned long long)*(unsigned long long *)value;
+    break;
+  case RECONN_VALUE_S8:
+    return (unsigned long long)*(char *)value;
+    break;
+  case RECONN_VALUE_S16:
+    return (unsigned long long)*(short *)value;
+    break;
+  case RECONN_VALUE_S32:
+    return (unsigned long long)*(long *)value;
+    break;
+  case RECONN_VALUE_S64:
+    return (unsigned long long)*(long long *)value;
+    break;
+  case RECONN_VALUE_F32:
+    return (unsigned long long)*(float *)value;
+    break;
+  case RECONN_VALUE_F64:
+    return (unsigned long long)*(double *)value;
+    break;
+  default:
+    return 0;
+    break;
+  }
+}
+long long reconn_value_to_s64(ReconnValueKind kind, const void *value) {
+  switch (kind) {
+  case RECONN_VALUE_U8:
+    return (long long)*(unsigned char *)value;
+    break;
+  case RECONN_VALUE_U16:
+    return (long long)*(unsigned short *)value;
+    break;
+  case RECONN_VALUE_U32:
+    return (long long)*(unsigned long *)value;
+    break;
+  case RECONN_VALUE_U64:
+    return (long long)*(unsigned long long *)value;
+    break;
+  case RECONN_VALUE_S8:
+    return (long long)*(char *)value;
+    break;
+  case RECONN_VALUE_S16:
+    return (long long)*(short *)value;
+    break;
+  case RECONN_VALUE_S32:
+    return (long long)*(long *)value;
+    break;
+  case RECONN_VALUE_S64:
+    return (long long)*(long long *)value;
+    break;
+  case RECONN_VALUE_F32:
+    return (long long)*(float *)value;
+    break;
+  case RECONN_VALUE_F64:
+    return (long long)*(double *)value;
+    break;
+  default:
+    return 0;
+    break;
+  }
+}
+double reconn_value_to_f64(ReconnValueKind kind, const void *value) {
+  switch (kind) {
+  case RECONN_VALUE_U8:
+    return (double)*(unsigned char *)value;
+    break;
+  case RECONN_VALUE_U16:
+    return (double)*(unsigned short *)value;
+    break;
+  case RECONN_VALUE_U32:
+    return (double)*(unsigned long *)value;
+    break;
+  case RECONN_VALUE_U64:
+    return (double)*(unsigned long long *)value;
+    break;
+  case RECONN_VALUE_S8:
+    return (double)*(char *)value;
+    break;
+  case RECONN_VALUE_S16:
+    return (double)*(short *)value;
+    break;
+  case RECONN_VALUE_S32:
+    return (double)*(long *)value;
+    break;
+  case RECONN_VALUE_S64:
+    return (double)*(long long *)value;
+    break;
+  case RECONN_VALUE_F32:
+    return (double)*(float *)value;
+    break;
+  case RECONN_VALUE_F64:
+    return (double)*(double *)value;
+    break;
+  default:
+    return 0;
+    break;
+  }
+}
+
 #endif
