@@ -5,6 +5,8 @@
 #include "reconn/data/buffer_string.h"
 #include "reconn/data/number.h"
 //#include "reconn/data/value.h"
+#include "reconn/module/core.h"
+#include "reconn/module/io.h"
 #include "reconn/parse.h"
 #include "reconn/vm.h"
 #include <assert.h>
@@ -78,7 +80,11 @@ void repl(ReconnVM *vm) {
 
     while (reconn_vm_tick(vm))
       ;
-
+    if (vm->got_error) {
+      printf("<!> Resetting enviroment\n");
+      reconn_buffer_reset(&vm->run_stack);
+      reconn_buffer_reset(&vm->value_stack);
+    }
     fprintf(stderr, ">");
   }
 
@@ -91,43 +97,11 @@ int say_hello(ReconnVM *vm) {
   return 0;
 }
 
-int x_stack(ReconnVM *vm) {
-  // reconn_buffer_print(&vm->value_stack);
-  reconn_buffer_pprint(&vm->value_stack);
-  return 0;
-}
-
-int x_stop(ReconnVM *vm) {
-  vm->running = 0;
-  return 0;
-}
-
-int pcompile_start(ReconnVM *vm) {
-  vm->compile = 1;
-  reconn_buffer_reset(&vm->compile_buffer);
-
-  return 0;
-}
-
-int ccompile_stop(ReconnVM *vm) {
-  vm->compile = 0;
-  return 0;
-}
-
-int pdef(ReconnVM *vm) {
-  assert(reconn_buffer_count(&vm->value_stack) > 0);
-  char *name = reconn_buffer_pop_cstring(&vm->value_stack);
-  reconn_vm_add_secondary(vm, name);
-  vm->compile = 0;
-  free(name);
-  return 0;
-}
-
 int main() {
   tbd();
 
-  const char *cake = reconn_value_kind_to_string(RECONN_VALUE_S64);
-  printf("%s\n", cake);
+  // const char *cake = reconn_value_kind_to_string(RECONN_VALUE_S64);
+  // printf("%s\n", cake);
 
   /*
   ReconnNumber num_a = reconn_makeNumber(12304510000, 6);
@@ -144,12 +118,13 @@ int main() {
 
   ReconnVM vm = reconn_makeVM();
   reconn_vm_add_primary(&vm, "hello", say_hello);
-  reconn_vm_add_primary(&vm, "stack", x_stack);
-  reconn_vm_add_primary(&vm, "bye", x_stop);
 
-  reconn_vm_add_primary(&vm, "[", pcompile_start);
-  reconn_vm_add_compile(&vm, "]", ccompile_stop);
-  reconn_vm_add_primary(&vm, "def", pdef);
+  // reconn_vm_add_primary(&vm, "[", pcompile_start);
+  // reconn_vm_add_compile(&vm, "]", ccompile_stop);
+  // reconn_vm_add_primary(&vm, "def", pdef);
+
+  reconn_mod_core_register_all(&vm);
+  reconn_mod_io_register_all(&vm);
 
   repl(&vm);
   reconn_vm_free(&vm, 0);

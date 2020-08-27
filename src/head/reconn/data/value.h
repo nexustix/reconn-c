@@ -155,7 +155,7 @@ const char *reconn_value_kind_to_string(ReconnValueKind kind) {
 
 char *reconn_value_value_to_string(ReconnValueKind kind, const void *value) {
 
-  char *str = malloc(32);
+  char *str = (char *)malloc(32);
 
   switch (kind) {
   case RECONN_VALUE_VOID:
@@ -232,6 +232,84 @@ char *reconn_value_value_to_string(ReconnValueKind kind, const void *value) {
     break;
   }
   return str;
+}
+
+int reconn_value_is_true(ReconnValueKind kind, const void *value) {
+  switch (kind) {
+  case RECONN_VALUE_VOID:
+    return 0;
+    break;
+  case RECONN_VALUE_EMPTY:
+    return 0;
+    break;
+  case RECONN_VALUE_UNDEFINED:
+    return -1;
+    break;
+  case RECONN_VALUE_U8:
+    return *(unsigned char *)value;
+    break;
+  case RECONN_VALUE_U16:
+    return *(unsigned short *)value;
+    break;
+  case RECONN_VALUE_U32:
+    return *(unsigned long *)value;
+    break;
+  case RECONN_VALUE_U64:
+    return *(unsigned long long *)value;
+    break;
+  case RECONN_VALUE_S8:
+    return *(char *)value;
+    break;
+  case RECONN_VALUE_S16:
+    return *(short *)value;
+    break;
+  case RECONN_VALUE_S32:
+    return *(long *)value;
+    break;
+  case RECONN_VALUE_S64:
+    return *(long long *)value;
+    break;
+  case RECONN_VALUE_F32:
+    return *(float *)value;
+    break;
+  case RECONN_VALUE_F64:
+    return *(double *)value;
+    break;
+  case RECONN_VALUE_RCN_NUMBER:
+    // FIXME RCN NUMBERS WILL NEVER EVALUATE TO TRUE
+    return 0;
+    break;
+  case RECONN_VALUE_BYTE_STRING:
+    return !(((char *)value) == 0);
+    break;
+  case RECONN_VALUE_C_STRING:
+    return !(((char *)value) == 0);
+    break;
+  case RECONN_VALUE_STRUCT:
+    return 1;
+    break;
+  case RECONN_VALUE_POINTER:
+    return !(value == NULL);
+    break;
+  case RECONN_VALUE_WORD_POINTER:
+    return 1;
+    break;
+  case RECONN_VALUE_WORD_PRIMARY:
+    return 1;
+    break;
+  case RECONN_VALUE_WORD_SECONDARY:
+    return 1;
+    break;
+  case RECONN_VALUE_WORD_COMPILE:
+    return 1;
+    break;
+  case RECONN_VALUE_WORD_BUFFER:
+    return 1;
+    break;
+  default:
+    return -1;
+    break;
+  }
 }
 
 #endif

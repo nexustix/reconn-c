@@ -33,6 +33,7 @@ typedef struct ReconnVM {
   size_t ndepth;
 
   // TBD
+  int debug;
   int running;
   int got_error;
   int compile;
@@ -55,10 +56,12 @@ ReconnVM reconn_makeVM() {
   self.compile_buffer = reconn_makeBuffer();
 
   self.ndepth = 0;
+  self.debug = 0;
   self.running = 1;
   self.got_error = 0;
   self.compile = 0;
   self.comment = 0;
+
   // push null
   reconn_buffer_push_bytestring(&self.namespace_stack, "\0", 1);
   return self;
@@ -131,6 +134,7 @@ void reconn_vm_enter_namespace(ReconnVM *self, char *nspace) {
     // push null
     reconn_buffer_push_bytestring(&self->namespace_stack, "\0", 1);
   } else {
+    // TODO add actual error
     assert(0);
   }
 
@@ -156,6 +160,7 @@ void reconn_vm_leave_namespace(ReconnVM *self) {
     // push null
     reconn_buffer_push_bytestring(&self->namespace_stack, "\0", 1);
   } else {
+    // TODO add actual error
     assert(0);
   }
 
@@ -312,6 +317,10 @@ int reconn_vm_try_secondary(ReconnVM *self, const char *token) {
   return 0;
 }
 
+void reconn_vm_push_run(ReconnVM *self, const char *token) {
+  reconn_buffer_push_cstring(&self->run_stack, token);
+}
+
 /*
 ======
 TOKENS
@@ -332,9 +341,9 @@ int reconn_vm_do_token(ReconnVM *self, const char *token) {
   if (!self->comment) {
     if (!self->compile) {
       if (reconn_vm_try_primary(self, token)) {
-        return 1;
+        return !self->got_error;
       } else if (reconn_vm_try_secondary(self, token)) {
-        return 1;
+        return !self->got_error;
       } else if (reconn_ducktype_as_whatever(&self->value_stack, token)) {
         return 1;
       }
@@ -360,8 +369,12 @@ int reconn_vm_tick(ReconnVM *self) {
     if (reconn_vm_do_token(self, next_token)) {
       free(next_token);
       return 1;
+    } else if (self->got_error) {
+      printf("<!> error handling token >%s<\n", next_token);
+      free(next_token);
+      return 0;
     } else {
-      printf("<!> unable to handle token >%s<\n", next_token);
+      printf("<!> no idea what >%s< means\n", next_token);
       free(next_token);
       self->got_error = 1;
       return 0;
