@@ -134,7 +134,7 @@ int reconn_mod_core_register_all(ReconnVM *vm) {
   reconn_vm_add_primary(vm, "if", reconn_mod_core_pif);
 
   reconn_vm_add_primary(vm, "stack", reconn_mod_core_pstack);
-  reconn_vm_add_primary(vm, "stop", reconn_mod_core_pstop);
+  reconn_vm_add_primary(vm, "bye", reconn_mod_core_pstop);
   return 0;
 }
 

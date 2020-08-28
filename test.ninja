@@ -1,7 +1,7 @@
 
 c_flags_fast = -Wall -march=native -g0 -O3
 c_flags_debug = -Wall -Werror -g
-c_flags = -lm
+c_flags =
 c_compiler = gcc
 
 rule c_so
