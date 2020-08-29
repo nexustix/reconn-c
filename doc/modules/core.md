@@ -1,13 +1,13 @@
 ## core
 
-### ✓ (
+### ✓ [
 wipe compile buffer
 enter compile mode
-### ✓ )
+### ✓ ]
 leave compile mode
-### ✓ ()
+### ✓ []
 wipe compile buffer
-### ✓ (/
+### ✓ /[
 enter compile mode
 ### ✓ def ( :string -- )
 define new secondary word
@@ -22,7 +22,7 @@ dynamically load library
 use primary module
 ### include ( :string -- )
 include code from user module
-### do ( :string -- )
+### ✓ do ( :string -- )
 run word by name
 ### words ( :string -- )
 list registered words

@@ -2,6 +2,7 @@
 #define RECONN_MODULES_CORE_H
 
 #include "../data/buffer.h"
+#include "../util.h"
 #include "../vm.h"
 #include <assert.h>
 
@@ -119,11 +120,25 @@ int reconn_mod_core_pif(ReconnVM *vm) {
   return 0;
 }
 
+int reconn_mod_core_include(ReconnVM *vm) {
+  if (!(reconn_buffer_count(&vm->value_stack) > 0)) {
+    vm->got_error = 1;
+    return -1;
+  }
+
+  char *filename = reconn_buffer_pop_cstring(&vm->value_stack);
+  reconn_util_do_file(vm, filename);
+  free(filename);
+
+  return 0;
+}
+
 int reconn_mod_core_register_all(ReconnVM *vm) {
   reconn_vm_add_primary(vm, "[", reconn_mod_core_pstart_wipe);
   reconn_vm_add_primary(vm, "[/", reconn_mod_core_pstart);
   reconn_vm_add_compile(vm, "]", reconn_mod_core_cstop);
   reconn_vm_add_primary(vm, "def", reconn_mod_core_pdef);
+  reconn_vm_add_primary(vm, "include", reconn_mod_core_include);
 
   reconn_vm_add_primary(vm, "enter", reconn_mod_core_penter);
   reconn_vm_add_primary(vm, "leave", reconn_mod_core_peleave);

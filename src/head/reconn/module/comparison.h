@@ -2,6 +2,7 @@
 #define RECONN_MODULES_COMPARISON_H
 
 #include "../vm.h"
+#include <string.h>
 
 int reconn_mod_comp_gt(ReconnVM *vm) {
   if (!(reconn_buffer_count(&vm->value_stack) > 0)) {
@@ -28,8 +29,8 @@ int reconn_mod_comp_gt(ReconnVM *vm) {
     long long a = reconn_value_to_s64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a > b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a > b);
   }
   return 0;
@@ -59,8 +60,8 @@ int reconn_mod_comp_lt(ReconnVM *vm) {
     long long a = reconn_value_to_s64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a < b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a < b);
   }
   return 0;
@@ -74,26 +75,34 @@ int reconn_mod_comp_eq(ReconnVM *vm) {
   const ReconnValueKind kind_b = reconn_buffer_kind_at(&vm->value_stack, -1);
   const ReconnValueKind kind_a = reconn_buffer_kind_at(&vm->value_stack, -2);
 
-  const void *value_b = reconn_buffer_pop_void(&vm->value_stack);
-  const void *value_a = reconn_buffer_pop_void(&vm->value_stack);
+  if (reconn_value_is_number(kind_a) && reconn_value_is_number(kind_b)) {
 
-  if (!(reconn_value_is_number(kind_a) && reconn_value_is_number(kind_b))) {
+    const void *value_b = reconn_buffer_pop_void(&vm->value_stack);
+    const void *value_a = reconn_buffer_pop_void(&vm->value_stack);
+
+    if (reconn_value_is_float(kind_a) || reconn_value_is_float(kind_b)) {
+      double b = reconn_value_to_f64(kind_b, value_b);
+      double a = reconn_value_to_f64(kind_a, value_a);
+      reconn_buffer_push_s8(&vm->value_stack, a == b);
+    } else if (reconn_value_is_signed(kind_a) ||
+               reconn_value_is_signed(kind_b)) {
+      long long b = reconn_value_to_s64(kind_b, value_b);
+      long long a = reconn_value_to_s64(kind_a, value_a);
+      reconn_buffer_push_s8(&vm->value_stack, a == b);
+    } else {
+      unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+      unsigned long long a = reconn_value_to_u64(kind_a, value_a);
+      reconn_buffer_push_s8(&vm->value_stack, a == b);
+    }
+  } else if (kind_a == RECONN_VALUE_C_STRING && kind_a == kind_b) {
+    char *value_b = reconn_buffer_pop_cstring(&vm->value_stack);
+    char *value_a = reconn_buffer_pop_cstring(&vm->value_stack);
+    reconn_buffer_push_s8(&vm->value_stack, !strcmp(value_a, value_b));
+    free(value_a);
+    free(value_b);
+  } else {
     vm->got_error = 1;
     return -1;
-  }
-
-  if (reconn_value_is_float(kind_a) || reconn_value_is_float(kind_b)) {
-    double b = reconn_value_to_f64(kind_b, value_b);
-    double a = reconn_value_to_f64(kind_a, value_a);
-    reconn_buffer_push_s8(&vm->value_stack, a == b);
-  } else if (reconn_value_is_signed(kind_a) || reconn_value_is_signed(kind_b)) {
-    long long b = reconn_value_to_s64(kind_b, value_b);
-    long long a = reconn_value_to_s64(kind_a, value_a);
-    reconn_buffer_push_s8(&vm->value_stack, a == b);
-  } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
-    reconn_buffer_push_s8(&vm->value_stack, a == b);
   }
   return 0;
 }
@@ -123,8 +132,8 @@ int reconn_mod_comp_ge(ReconnVM *vm) {
     long long a = reconn_value_to_s64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a >= b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a >= b);
   }
   return 0;
@@ -155,8 +164,8 @@ int reconn_mod_comp_le(ReconnVM *vm) {
     long long a = reconn_value_to_s64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a <= b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_s8(&vm->value_stack, a <= b);
   }
   return 0;

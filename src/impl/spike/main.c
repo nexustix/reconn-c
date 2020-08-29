@@ -10,6 +10,7 @@
 #include "reconn/module/io.h"
 #include "reconn/module/math.h"
 #include "reconn/parse.h"
+#include "reconn/util.h"
 #include "reconn/vm.h"
 #include <assert.h>
 #include <limits.h>
@@ -129,6 +130,9 @@ int main() {
   reconn_mod_io_register_all(&vm);
   reconn_mod_math_register_all(&vm);
   reconn_mod_comparison_register_all(&vm);
+
+  // do_file();
+  // reconn_util_do_file(&vm, "test.rcn");
 
   repl(&vm);
   reconn_vm_free(&vm, 0);

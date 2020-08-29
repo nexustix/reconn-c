@@ -33,8 +33,8 @@ int reconn_mod_math_add(ReconnVM *vm) {
     long long a = reconn_value_to_s64(kind_a, value_a);
     reconn_buffer_push_s64(&vm->value_stack, a + b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_u64(&vm->value_stack, a + b);
   }
   return 0;
@@ -65,8 +65,8 @@ int reconn_mod_math_sub(ReconnVM *vm) {
     long long a = reconn_value_to_s64(kind_a, value_a);
     reconn_buffer_push_s64(&vm->value_stack, a - b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_u64(&vm->value_stack, a - b);
   }
   return 0;
@@ -97,8 +97,8 @@ int reconn_mod_math_mul(ReconnVM *vm) {
     long long a = reconn_value_to_s64(kind_a, value_a);
     reconn_buffer_push_s64(&vm->value_stack, a * b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_u64(&vm->value_stack, a * b);
   }
   return 0;
@@ -134,8 +134,8 @@ int reconn_mod_math_rdiv(ReconnVM *vm) {
     reconn_buffer_push_s64(&vm->value_stack, a / b);
     reconn_buffer_push_s64(&vm->value_stack, a % b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_u64(&vm->value_stack, a / b);
     reconn_buffer_push_u64(&vm->value_stack, a % b);
   }
@@ -196,8 +196,8 @@ int reconn_mod_math_idiv(ReconnVM *vm) {
     reconn_buffer_push_s64(&vm->value_stack, a / b);
     // reconn_buffer_push_s64(&vm->value_stack, a % b);
   } else {
-    long long b = reconn_value_to_u64(kind_b, value_b);
-    long long a = reconn_value_to_u64(kind_a, value_a);
+    unsigned long long b = reconn_value_to_u64(kind_b, value_b);
+    unsigned long long a = reconn_value_to_u64(kind_a, value_a);
     reconn_buffer_push_u64(&vm->value_stack, a / b);
     // reconn_buffer_push_u64(&vm->value_stack, a % b);
   }
