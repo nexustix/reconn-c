@@ -67,6 +67,17 @@ ReconnVM reconn_makeVM() {
   return self;
 }
 
+void reconn_vm_reset_soft(ReconnVM *self) {
+  reconn_buffer_reset(&self->run_stack);
+  reconn_buffer_reset(&self->value_stack);
+  self->ndepth = 0;
+  self->debug = 0;
+  self->running = 1;
+  self->got_error = 0;
+  self->compile = 0;
+  self->comment = 0;
+}
+
 void reconn_vm_free(ReconnVM *self, int free_self) {
 
   reconn_buffer_free(&self->run_stack, 0);
@@ -363,24 +374,28 @@ int reconn_vm_do_token(ReconnVM *self, const char *token) {
 
 int reconn_vm_tick(ReconnVM *self) {
   self->got_error = 0;
-  if (self->run_stack.count) {
-    char *next_token = reconn_buffer_pop_cstring(&self->run_stack);
+  if (self->running) {
+    if (self->run_stack.count) {
+      char *next_token = reconn_buffer_pop_cstring(&self->run_stack);
 
-    if (reconn_vm_do_token(self, next_token)) {
-      free(next_token);
-      return 1;
-    } else if (self->got_error) {
-      printf("<!> error handling token >%s<\n", next_token);
-      free(next_token);
-      return 0;
-    } else {
-      printf("<!> no idea what >%s< means\n", next_token);
-      free(next_token);
-      self->got_error = 1;
-      return 0;
+      if (reconn_vm_do_token(self, next_token)) {
+        free(next_token);
+        return 1;
+      } else if (self->got_error) {
+        printf("<!> error handling token >%s<\n", next_token);
+        free(next_token);
+        return 0;
+      } else {
+        printf("<!> no idea what >%s< means\n", next_token);
+        free(next_token);
+        self->got_error = 1;
+        return 0;
+      }
     }
+    return 0;
+  } else {
+    return 0;
   }
-  return 0;
 }
 
 // void reconn_vm_run(ReconnVM *self) {

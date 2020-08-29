@@ -197,6 +197,23 @@ ReconnValueKind reconn_buffer_kind_at(ReconnBuffer *self, int index) {
   }
 }
 
+size_t reconn_buffer_size_at(ReconnBuffer *self, int index) {
+  if (index < 0) {
+    return self->items[self->count + index].stop -
+           self->items[self->count + index].start;
+  } else {
+    return self->items[index].start - self->items[index].stop;
+  }
+}
+
+void *reconn_buffer_pointer_at(ReconnBuffer *self, int index) {
+  if (index < 0) {
+    return (void *)&self->data[self->items[self->count + index].start];
+  } else {
+    return (void *)&self->data[self->items[index].start];
+  }
+}
+
 // ReconnValueKind reconn_buffer_kind_top(ReconnBuffer *self) {
 //  return self->items[self->lasti].kind;
 //}
@@ -220,5 +237,39 @@ void reconn_buffer_pprint(ReconnBuffer *self) {
   }
   printf("<bottom>\n");
 }
+
+void reconn_buffer_drop(ReconnBuffer *self) { reconn_buffer_pop_void(self); }
+void reconn_buffer_dup(ReconnBuffer *self) {
+  ReconnValueKind kind = reconn_buffer_kind_at(self, -1);
+  size_t size = reconn_buffer_size_at(self, -1);
+  const void *pointer = reconn_buffer_pop_void(self);
+  reconn_buffer_push_void(self, pointer, size, kind);
+  reconn_buffer_push_void(self, pointer, size, kind);
+}
+
+void reconn_buffer_swap(ReconnBuffer *self) {
+  ReconnValueKind kind_b = reconn_buffer_kind_at(self, -1);
+  ReconnValueKind kind_a = reconn_buffer_kind_at(self, -2);
+  size_t size_b = reconn_buffer_size_at(self, -1);
+  size_t size_a = reconn_buffer_size_at(self, -2);
+  const void *pointer_b = reconn_buffer_pop_void(self);
+  const void *pointer_a = reconn_buffer_pop_void(self);
+
+  void *tmp_a = malloc(size_a);
+  memcpy(tmp_a, pointer_a, size_a);
+
+  reconn_buffer_push_void(self, pointer_b, size_b, kind_b);
+  reconn_buffer_push_void(self, tmp_a, size_a, kind_a);
+
+  free(tmp_a);
+}
+
+void reconn_buffer_over(ReconnBuffer *self) {
+  ReconnValueKind kind = reconn_buffer_kind_at(self, -2);
+  size_t size = reconn_buffer_size_at(self, -2);
+  const void *pointer = reconn_buffer_pointer_at(self, -2);
+  reconn_buffer_push_void(self, pointer, size, kind);
+}
+void reconn_buffer_rot(ReconnBuffer *self);
 
 #endif

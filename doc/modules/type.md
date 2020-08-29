@@ -1,0 +1,9 @@
+### tou8
+### tou16
+### tou32
+### tou64
+### tos8
+### tos16
+### tos32
+### tos64
+### tocstr

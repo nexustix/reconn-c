@@ -9,6 +9,7 @@
 #include "reconn/module/core.h"
 #include "reconn/module/io.h"
 #include "reconn/module/math.h"
+#include "reconn/module/stack.h"
 #include "reconn/parse.h"
 #include "reconn/util.h"
 #include "reconn/vm.h"
@@ -85,10 +86,13 @@ void repl(ReconnVM *vm) {
       ;
     if (vm->got_error) {
       printf("<!> Resetting enviroment\n");
-      reconn_buffer_reset(&vm->run_stack);
-      reconn_buffer_reset(&vm->value_stack);
+      // reconn_buffer_reset(&vm->run_stack);
+      // reconn_buffer_reset(&vm->value_stack);
+      reconn_vm_reset_soft(vm);
     }
-    fprintf(stderr, ">");
+    if (vm->running) {
+      fprintf(stderr, ">");
+    }
   }
 
   reconn_buffer_free(&inputBuffer, 0);
@@ -130,6 +134,7 @@ int main() {
   reconn_mod_io_register_all(&vm);
   reconn_mod_math_register_all(&vm);
   reconn_mod_comparison_register_all(&vm);
+  reconn_mod_stack_register_all(&vm);
 
   // do_file();
   // reconn_util_do_file(&vm, "test.rcn");

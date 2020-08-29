@@ -40,6 +40,12 @@ int reconn_mod_core_pstack(ReconnVM *vm) {
   return 0;
 }
 
+int reconn_mod_core_pdstack(ReconnVM *vm) {
+  // reconn_buffer_print(&vm->value_stack);
+  reconn_buffer_print(&vm->value_stack);
+  return 0;
+}
+
 int reconn_mod_core_pstop(ReconnVM *vm) {
   vm->running = 0;
   return 0;
@@ -133,6 +139,11 @@ int reconn_mod_core_include(ReconnVM *vm) {
   return 0;
 }
 
+int reconn_mod_core_reset(ReconnVM *vm) {
+  reconn_vm_reset_soft(vm);
+  return 0;
+}
+
 int reconn_mod_core_register_all(ReconnVM *vm) {
   reconn_vm_add_primary(vm, "[", reconn_mod_core_pstart_wipe);
   reconn_vm_add_primary(vm, "[/", reconn_mod_core_pstart);
@@ -149,7 +160,9 @@ int reconn_mod_core_register_all(ReconnVM *vm) {
   reconn_vm_add_primary(vm, "if", reconn_mod_core_pif);
 
   reconn_vm_add_primary(vm, "stack", reconn_mod_core_pstack);
+  reconn_vm_add_primary(vm, "dstack", reconn_mod_core_pdstack);
   reconn_vm_add_primary(vm, "bye", reconn_mod_core_pstop);
+  reconn_vm_add_primary(vm, "reset", reconn_mod_core_reset);
   return 0;
 }
 

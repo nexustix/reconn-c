@@ -1,17 +1,41 @@
-"Welcome to best number divider!" println
+"Example Calculator program" println
 
 [ "please enter first number>" print 
-  inputln ducktype
+  inputln ( trim ) ducktype
   :getb :geta if
 ] :geta def
 
 [ "please enter second number>" print 
-  inputln ducktype
-  :divide :getb if
+  inputln ( trim ) ducktype
+  :getop :getb if
 ] :getb def
 
-[ "your amazing result is = " print
-  / println
-] :divide def
+[ "choose operation (+|-|*|/)>" print
+  inputln ( trim )
+  dup "+" = :xadd when
+  dup "-" = :xsub when
+  dup "*" = :xmul when
+  dup "/" = :xdiv when
+  drop stack :getop do
+] :getop def
+
+[ "result is = " print drop
+] :header def
+
+[ header
+  + println reset
+] :xadd def
+
+[ header
+  - println reset
+] :xsub def
+
+[ header
+  * println reset
+] :xmul def
+
+[ header
+  / println reset
+] :xdiv def
 
 geta
