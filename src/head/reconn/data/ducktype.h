@@ -191,6 +191,11 @@ int reconn_ducktype_as_double(ReconnBuffer *buffer, const char *token) {
   return 0;
 }
 
+int reconn_ducktype_as_number(ReconnBuffer *buffer, const char *token) {
+  return reconn_ducktype_as_int(buffer, token, 10) ||
+         reconn_ducktype_as_double(buffer, token);
+}
+
 // double
 
 int reconn_ducktype_as_whatever(ReconnBuffer *buffer, const char *token) {

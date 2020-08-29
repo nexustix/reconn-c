@@ -1,2 +1,17 @@
-[ "hello world" println ] :greet def
-greet
+"Welcome to best number divider!" println
+
+[ "please enter first number>" print 
+  inputln ducktype
+  :getb :geta if
+] :geta def
+
+[ "please enter second number>" print 
+  inputln ducktype
+  :divide :getb if
+] :getb def
+
+[ "your amazing result is = " print
+  / println
+] :divide def
+
+geta

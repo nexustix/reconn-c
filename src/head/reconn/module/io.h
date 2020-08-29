@@ -75,6 +75,11 @@ int reconn_mod_io_acceptln(ReconnVM *vm) {
   char *data = NULL;
   getline(&data, &size, stdin);
 
+  // FIXME add a "trim" word instead
+  int len = strlen(data);
+  if (data[len - 1] == '\n')
+    data[len - 1] = 0;
+
   reconn_buffer_push_cstring(&vm->value_stack, data);
 
   free(data);
@@ -93,7 +98,7 @@ int reconn_mod_io_ducktype(ReconnVM *vm) {
 
   char *str = reconn_buffer_pop_cstring(&vm->value_stack);
 
-  if (reconn_ducktype_as_whatever(&vm->value_stack, str)) {
+  if (reconn_ducktype_as_number(&vm->value_stack, str)) {
     free(str);
     reconn_buffer_push_s8(&vm->value_stack, 1);
     return 1;
