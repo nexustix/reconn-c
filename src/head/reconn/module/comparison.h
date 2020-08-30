@@ -100,6 +100,8 @@ int reconn_mod_comp_eq(ReconnVM *vm) {
     reconn_buffer_push_s8(&vm->value_stack, !strcmp(value_a, value_b));
     free(value_a);
     free(value_b);
+  } else if (kind_a != kind_b) {
+    reconn_buffer_push_s8(&vm->value_stack, 0);
   } else {
     vm->got_error = 1;
     return -1;

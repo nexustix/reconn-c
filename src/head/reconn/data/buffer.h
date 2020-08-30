@@ -153,10 +153,14 @@ GETTING ITEMS
 */
 
 const void *reconn_buffer_get_void(ReconnBuffer *self, size_t index) {
-  const size_t start = self->items[index].start;
-  // const size_t size = self->items[index].stop - self->items[index].start;
-  // void *data = malloc(size);
-  // memcpy(data, &self->data[start], size);
+  size_t start;
+  if (index < 0) {
+    start = self->items[self->count + index].start;
+  } else {
+    start = self->items[index].start;
+  }
+  // const size_t start = self->items[index].start;
+
   return &self->data[start];
 }
 
@@ -270,6 +274,23 @@ void reconn_buffer_over(ReconnBuffer *self) {
   const void *pointer = reconn_buffer_pointer_at(self, -2);
   reconn_buffer_push_void(self, pointer, size, kind);
 }
-void reconn_buffer_rot(ReconnBuffer *self);
+// void reconn_buffer_rot(ReconnBuffer *self);
+
+void reconn_buffer_transfer(ReconnBuffer *destination, ReconnBuffer *source) {
+  ReconnValueKind kind = reconn_buffer_kind_at(source, -1);
+  size_t size = reconn_buffer_size_at(source, -1);
+  const void *pointer = reconn_buffer_pop_void(source);
+
+  reconn_buffer_push_void(destination, pointer, size, kind);
+}
+
+void reconn_buffer_copy(ReconnBuffer *destination, int index,
+                        ReconnBuffer *source) {
+  ReconnValueKind kind = reconn_buffer_kind_at(source, index);
+  size_t size = reconn_buffer_size_at(source, index);
+  const void *pointer = reconn_buffer_get_void(source, index);
+
+  reconn_buffer_push_void(destination, pointer, size, kind);
+}
 
 #endif

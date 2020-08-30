@@ -210,7 +210,7 @@ char *reconn_value_value_to_string(ReconnValueKind kind, const void *value) {
     sprintf(str, "_");
     break;
   case RECONN_VALUE_POINTER:
-    sprintf(str, "_");
+    sprintf(str, "%llu", (unsigned long long)value);
     break;
   case RECONN_VALUE_WORD_POINTER:
     sprintf(str, "_");

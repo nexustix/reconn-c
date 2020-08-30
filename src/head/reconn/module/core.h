@@ -34,6 +34,11 @@ int reconn_mod_core_pdef(ReconnVM *vm) {
   return 0;
 }
 
+int reconn_mod_core_clean_compile(ReconnVM *vm) {
+  reconn_buffer_reset(&vm->compile_buffer);
+  return 0;
+}
+
 int reconn_mod_core_pstack(ReconnVM *vm) {
   // reconn_buffer_print(&vm->value_stack);
   reconn_buffer_pprint(&vm->value_stack);
@@ -146,8 +151,10 @@ int reconn_mod_core_reset(ReconnVM *vm) {
 
 int reconn_mod_core_register_all(ReconnVM *vm) {
   reconn_vm_add_primary(vm, "[", reconn_mod_core_pstart_wipe);
+  reconn_vm_add_primary(vm, "[]", reconn_mod_core_clean_compile);
   reconn_vm_add_primary(vm, "[/", reconn_mod_core_pstart);
   reconn_vm_add_compile(vm, "]", reconn_mod_core_cstop);
+
   reconn_vm_add_primary(vm, "def", reconn_mod_core_pdef);
   reconn_vm_add_primary(vm, "include", reconn_mod_core_include);
 

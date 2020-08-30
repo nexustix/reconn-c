@@ -5,6 +5,7 @@
 #include "reconn/data/buffer_string.h"
 #include "reconn/data/number.h"
 //#include "reconn/data/value.h"
+#include "reconn/module/buffer.h"
 #include "reconn/module/comparison.h"
 #include "reconn/module/core.h"
 #include "reconn/module/io.h"
@@ -135,6 +136,7 @@ int main() {
   reconn_mod_math_register_all(&vm);
   reconn_mod_comparison_register_all(&vm);
   reconn_mod_stack_register_all(&vm);
+  reconn_mod_buffer_register_all(&vm);
 
   // do_file();
   // reconn_util_do_file(&vm, "test.rcn");
